@@ -271,8 +271,6 @@ dotnet run --verbose
 
 ## 📄 License
 
-## License
-
 Copyright © 2026 Timothy Robinson (github.com/robitn)
 
 ## 🙋 Support
