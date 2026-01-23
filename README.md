@@ -1,6 +1,6 @@
 # CNC Teensy OCP to CentroidAPI Console Application
 
-A robust, cross-platform C# console application that bridges Teensy-based Operator Control Panels (OCP) with Centroid CNC control systems via reliable serial communication.
+A robust C# console application that bridges Teensy-based Operator Control Panels (OCP) with Centroid CNC control systems via reliable serial communication.
 
 ## 🎯 Overview
 
@@ -14,7 +14,6 @@ This application establishes a reliable communication bridge between:
 
 ### 🔌 Reliable Serial Communication
 
-- **Cross-platform support**: Windows and macOS
 - **Automatic device discovery**: Scans all available serial ports
 - **Handshake protocol**: Validates Teensy identity (`TEENSY_OCP_001`)
 - **Message synchronization**: Handles partial/corrupted messages gracefully
@@ -52,8 +51,6 @@ CNC-OPC-Console/
 ├── Managers/
 │   └── TeensySerialManager.cs       # Serial communication management
 ├── Serial/
-│   ├── CrossPlatformSerialPort.cs   # Cross-platform serial abstraction
-│   ├── MacOSSerialPort.cs          # macOS POSIX serial implementation
 │   └── WindowsSerialPort.cs        # Windows System.IO.Ports wrapper
 ├── Services/
 │   ├── ConnectionMonitor.cs        # Connection health and reconnection
@@ -106,15 +103,15 @@ CNC Teensy OCP to CentroidAPI Console Application
 ✓ Teensy Serial Manager initialized
 [INIT] Discovering and connecting to Teensy...
 Found 5 serial port(s):
-  - /dev/cu.usbmodem181662401
-  - /dev/cu.usbserial-222410
-  - /dev/tty
-  - /dev/tty.usbmodem181662401
-  - /dev/tty.usbserial-222410
+  - COM3
+  - COM4
+  - COM5
+  - COM6
+  - COM7
 
-  Trying /dev/cu.usbmodem181662401...
+  Trying COM3...
     Received: TEENSY_OCP_001,1.0.0,0,0,0,4,0,56
-✓ Connected to Teensy on /dev/cu.usbmodem181662401 at 115200 baud
+✓ Connected to Teensy on COM3 at 115200 baud
   Starting CSV read loop...
 
 Listening for Teensy serial data...
@@ -194,7 +191,7 @@ public const int DISPLAY_THROTTLE_MS = 200;
 
 - Verify Teensy is connected via USB
 - Check that Teensy firmware sends handshake: `Serial.println("TEENSY_OCP_001,1.0.0,0,0,0,0,0,0");`
-- On macOS: Check `/dev/cu.*` devices with `ls -la /dev/cu.usbmodem*`
+- Check available COM ports in Device Manager
 
 ### Data Reception Issues
 
@@ -256,13 +253,11 @@ dotnet run --verbose
 #### Dependency Inversion
 
 - Services depend on abstractions (interfaces)
-- Cross-platform serial implementation
 - Pluggable logging via callbacks
 
 ## 📋 Dependencies
 
 - **.NET 9.0** - Target framework
-- **HidSharp 2.6.4** - USB HID device support (legacy)
 - **System.IO.Ports 4.5.0** - Serial port communication
 - **CentroidAPI.dll** - Centroid CNC control API (external)
 
