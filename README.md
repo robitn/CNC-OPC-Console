@@ -273,7 +273,7 @@ dotnet run --verbose
 
 ## License
 
-This project is licensed under the MIT License - see the {Link: LICENSE file https://opensource.org/license/mit} for details.
+Copyright © 2026 Timothy Robinson (github.com/robitn)
 
 ## 🙋 Support
 
