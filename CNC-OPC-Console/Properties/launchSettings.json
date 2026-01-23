@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CNC-OPC-Console": {
+      "commandName": "Project",
+      "commandLineArgs": "-foo 2 -bar 4 snafoo"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+﻿using System;
+using System.Collections.Generic;
+using CentroidAPI;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        try
+        {
+            // Display usage information if no arguments provided
+            if (args.Length == 0)
+            {
+                DisplayUsage();
+                return;
+            }
+
+            // Initialize CNCPipe
+            var cncPipe = new CNCPipe();
+            if (!cncPipe.IsConstructed())
+            {
+                throw new Exception("Failed to initialize CNCPipe.");
+            }
+    
+            // Parse command line arguments
+            var arguments = ParseArguments(args);
+
+            // Pass arguments to CNCPipe
+            ProcessArguments(cncPipe, arguments);
+
+            Console.WriteLine("Operation completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
+            Environment.Exit(1);
+        }
+    }
+
+    static Dictionary<string, string> ParseArguments(string[] args)
+    {
+        var arguments = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i].StartsWith("--"))
+            {
+                string key = args[i].Substring(2);
+                string value = string.Empty;
+
+                // Check if next argument exists and doesn't start with --
+                if (i + 1 < args.Length && !args[i + 1].StartsWith("--"))
+                {
+                    value = args[i + 1];
+                    i++;
+                }
+
+                arguments[key] = value;
+            }
+            else if (args[i].StartsWith("-") && args[i].Length > 1)
+            {
+                string key = args[i].Substring(1);
+                string value = string.Empty;
+
+                // Check if next argument exists and doesn't start with -
+                if (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                {
+                    value = args[i + 1];
+                    i++;
+                }
+
+                arguments[key] = value;
+            }
+        }
+
+        return arguments;
+    }
+
+    static void DisplayUsage()
+    {
+        Console.WriteLine("CNC-OPC Console Application");
+        Console.WriteLine("Usage: CNC-OPC-Console [options]");
+        Console.WriteLine();
+        Console.WriteLine("Options:");
+        Console.WriteLine("  --command <value>     Execute a specific command");
+        Console.WriteLine("  --help                Display this help message");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("  CNC-OPC-Console --command \"your-command\"");
+    }
+
+    static void ProcessArguments(CNCPipe cncPipe, Dictionary<string, string> arguments)
+    {
+        foreach (var arg in arguments)
+        {
+            Console.WriteLine($"Processing: {arg.Key} = {arg.Value}");
+
+            // TODO: Implement specific logic to pass arguments to CNCPipe
+            // Example: 
+            // if (arg.Key.Equals("command", StringComparison.OrdinalIgnoreCase))
+            // {
+            //     cncPipe.ExecuteCommand(arg.Value);
+            // }
+        }
+    }
+
+}

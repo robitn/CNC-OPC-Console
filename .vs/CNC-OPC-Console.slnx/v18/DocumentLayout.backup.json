@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|c:\\users\\cncsage\\source\\repos\\cnc-opc-console\\cnc-opc-console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|solutionrelative:cnc-opc-console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|c:\\users\\cncsage\\source\\repos\\cnc-opc-console\\cnc-opc-console\\cnc-opc-console.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|solutionrelative:cnc-opc-console\\cnc-opc-console.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|c:\\users\\cncsage\\source\\repos\\cnc-opc-console\\cnc-opc-console\\cnc-opc-console.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|solutionrelative:cnc-opc-console\\cnc-opc-console.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|c:\\users\\cncsage\\source\\repos\\cnc-opc-console\\cnc-opc-console\\implementation_guide.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{FFEAA46E-5E49-4F78-B640-0F5F85DC42F6}|CNC-OPC-Console\\CNC-OPC-Console.csproj|solutionrelative:cnc-opc-console\\implementation_guide.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CNC-OPC-Console",
+              "DocumentMoniker": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "RelativeDocumentMoniker": "CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "ToolTip": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "RelativeToolTip": "CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-22T01:43:28.9Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\Program.cs",
+              "RelativeDocumentMoniker": "CNC-OPC-Console\\Program.cs",
+              "ToolTip": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\Program.cs",
+              "RelativeToolTip": "CNC-OPC-Console\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAN0BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-22T20:29:07.986Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "IMPLEMENTATION_GUIDE.md",
+              "DocumentMoniker": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\IMPLEMENTATION_GUIDE.md",
+              "RelativeDocumentMoniker": "CNC-OPC-Console\\IMPLEMENTATION_GUIDE.md",
+              "ToolTip": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\IMPLEMENTATION_GUIDE.md",
+              "RelativeToolTip": "CNC-OPC-Console\\IMPLEMENTATION_GUIDE.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-01-22T20:17:15.215Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CNC-OPC-Console",
+              "DocumentMoniker": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "RelativeDocumentMoniker": "CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "ToolTip": "C:\\Users\\CncSage\\source\\repos\\CNC-OPC-Console\\CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "RelativeToolTip": "CNC-OPC-Console\\CNC-OPC-Console.csproj",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-22T20:14:46.238Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

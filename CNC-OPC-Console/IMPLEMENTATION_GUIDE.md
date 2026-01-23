@@ -1,0 +1,339 @@
+# CNC Teensy OCP to CentroidAPI Implementation Guide
+
+## Overview
+
+This console application bridges **Teensy Serial COM port communication** with the **CentroidAPI CNCPipe** for CNC machine control.
+
+The application performs an **automatic handshake** to verify the correct Teensy device is connected by looking for the `TEENSY_OCP_001` identifier in the device's initial JSON output.
+
+### Architecture
+
+```
+Teensy Device (via USB Serial COM Port)
+         ?
+  System.IO.Ports.SerialPort
+         ?
+  TeensySerialManager (COM port discovery & handshake)
+         ?
+  SerialToSettingsConverter (Data parsing - JSON/CSV/KeyValue)
+         ?
+  ApplySettings() (CNCPipe Integration)
+         ?
+    CNCPipe API
+         ?
+    CNC Machine
+```
+
+---
+
+## Components
+
+### 1. **TeensySerialManager**
+Handles USB-Serial COM port discovery and device verification via handshake.
+
+#### Configuration
+```csharp
+private const string TEENSY_HANDSHAKE_ID = "TEENSY_OCP_001";
+private const int HANDSHAKE_TIMEOUT_MS = 5000;
+private const int BAUD_RATE = 115200;
+```
+
+#### How It Works
+1. **Discovery Phase**: Scans all available COM ports
+2. **Handshake Phase**: For each port:
+   - Opens connection at 115200 baud
+   - Waits up to 5 seconds for Teensy to send initial data
+   - Looks for the string `TEENSY_OCP_001` in the received data
+   - If found, device is verified and connection is maintained
+   - If not found, closes port and tries next one
+
+#### Methods
+- `DiscoverAndConnect()` - Scans all COM ports and establishes handshake
+- `ReadLine()` - Reads line-delimited data from the serial port
+- `Disconnect()` - Cleanly closes the serial port
+
+---
+
+### 2. **TeensySerialManager - Handshake Example**
+
+Your Teensy firmware should output JSON containing the handshake ID in `setup()`:
+
+```cpp
+void setup() {
+    Serial.begin(115200);
+    delay(100); // Give host time to connect
+    
+    // Send initialization JSON with handshake ID
+    Serial.println("{\"device\": \"TEENSY_OCP_001\", \"version\": \"1.0\"}");
+}
+```
+
+The host application will:
+1. See the JSON output
+2. Detect `TEENSY_OCP_001` within it
+3. Print: `? Handshake successful on COM3`
+4. Proceed with normal command processing
+
+**?? CRITICAL**: The handshake string `TEENSY_OCP_001` MUST appear in your Teensy's initial output!
+
+---
+
+### 3. **SerialToSettingsConverter**
+Converts multiple data formats into CNC machine settings.
+
+#### Supported Formats
+
+##### **JSON Format** (Recommended)
+```json
+{"SpindleSpeed": 1200, "FeedRate": 50.5, "ToolNumber": 3}
+{"command": "move", "axis": "X", "value": 25.5}
+```
+
+##### **Key=Value Format**
+```
+SpindleSpeed=1200
+FeedRate=50.5;ToolNumber=3
+```
+
+##### **CSV Format**
+```
+SPINDLE,1200
+MOVE,X,25.5
+```
+
+##### **Fallback Format**
+```
+SPINDLE 1200
+MOVE X 25.5
+```
+
+#### Customizing Data Parsing
+
+Edit the `SerialToSettingsConverter.Convert()` method to handle your specific protocol:
+
+```csharp
+public Dictionary<string, object>? Convert(string data)
+{
+    // Your custom parsing logic here
+    // Return null if data is not recognized
+}
+```
+
+---
+
+## Usage
+
+### Basic Usage
+
+```bash
+CNC-OPC-Console.exe
+```
+
+### Expected Output
+
+```
+CNC Teensy OCP to CentroidAPI Console Application
+===================================================
+
+? CNCPipe initialized and constructed
+? Teensy Serial Manager initialized
+Found 2 COM port(s): COM3, COM5
+
+  Attempting to connect on COM3...
+    Handshake data: {"device": "TEENSY_OCP_001", "version": "1.0"}
+  ? Handshake successful on COM3
+? Connected to Teensy device with successful handshake
+
+Listening for Teensy serial data...
+
+[12:34:56.789] Received: {"SpindleSpeed": 1200}
+Converted to 1 settings:
+  ? SpindleSpeed: 1200
+```
+
+---
+
+## Teensy Firmware Example
+
+### Basic Setup with Handshake
+
+```cpp
+#include <ArduinoJson.h>
+
+void setup() {
+    Serial.begin(115200);
+    while (!Serial) delay(10);
+    
+    delay(100);
+    
+    // Send handshake JSON
+    StaticJsonDocument<256> doc;
+    doc["device"] = "TEENSY_OCP_001";
+    doc["version"] = "1.0";
+    doc["board"] = "Teensy 4.1";
+    serializeJson(doc, Serial);
+    Serial.println();
+}
+
+void loop() {
+    // Send spindle speed command as JSON
+    StaticJsonDocument<128> cmd;
+    cmd["command"] = "spindle";
+    cmd["speed"] = 1200;
+    cmd["direction"] = "CW";
+    
+    serializeJson(cmd, Serial);
+    Serial.println();
+    
+    delay(500);
+}
+```
+
+### Simple Text Format Example
+
+```cpp
+void setup() {
+    Serial.begin(115200);
+    delay(500);
+    Serial.println("TEENSY_OCP_001");
+}
+
+void loop() {
+    // Send simple key=value format
+    Serial.println("SpindleSpeed=1200");
+    delay(100);
+    Serial.println("FeedRate=50.5");
+    delay(100);
+}
+```
+
+---
+
+## Debugging
+
+### View Detected COM Ports
+
+The app automatically lists available COM ports:
+
+```
+Found 3 COM port(s): COM1, COM3, COM5
+  Attempting to connect on COM1...
+    ? Port in use or access denied
+  Attempting to connect on COM3...
+    ? No handshake received (timeout)
+  Attempting to connect on COM5...
+    Handshake data: {"device": "TEENSY_OCP_001", ...}
+  ? Handshake successful on COM5
+```
+
+### Handshake Troubleshooting
+
+**Problem**: "No handshake received (timeout)"
+- **Solution**: 
+  - Verify Teensy firmware is sending data in setup()
+  - Check that the string "TEENSY_OCP_001" is in the output
+  - Verify baud rate matches (115200)
+  - Use Serial Monitor to verify Teensy output
+
+**Problem**: "Port in use or access denied"
+- **Solution**:
+  - Close Serial Monitor before running app
+  - Check Device Manager for conflicting COM port usage
+  - Restart USB connection
+
+---
+
+## Real-World Example
+
+### Teensy Sends Movement Command
+```json
+{"command": "move", "axis": "X", "steps": 100, "speed": 50}
+```
+
+### Application Processing
+```
+[12:34:56.789] Received: {"command": "move", "axis": "X", "steps": 100, "speed": 50}
+Converted to 4 settings:
+  ? command: move
+  ? axis: X
+  ? steps: 100
+  ? speed: 50
+  ? Failed to apply command: (until you implement in ApplySettings)
+```
+
+### Implementation in ApplySettings()
+```csharp
+if (setting.Key == "command" && setting.Value.ToString() == "move")
+{
+    string axis = settings["axis"].ToString();
+    double steps = (double)settings["steps"];
+    double speed = (double)settings["speed"];
+    
+    cncPipe.MoveAxis(axis, steps, speed);
+}
+```
+
+---
+
+## Performance Considerations
+
+- **Baud Rate**: 115200 (standard for Teensy)
+- **Handshake Timeout**: 5000ms (waits 5 seconds per port for handshake)
+- **Read Timeout**: SerialPort operations have built-in timeouts
+- **Process Loop Delay**: 50ms between reads (prevents CPU spinning)
+
+Adjust these constants in `TeensySerialManager` if needed for your application.
+
+---
+
+## Dependencies
+
+- **CentroidAPI** - CNC machine control (local reference)
+- **System.IO.Ports** - Serial COM port communication (v4.5.0, built-in)
+
+---
+
+## Next Steps
+
+1. **Update Teensy Firmware** - Add handshake output with "TEENSY_OCP_001"
+2. **Test Handshake** - Run app and verify "Handshake successful" message
+3. **Define Data Format** - Choose JSON/CSV/KeyValue format for commands
+4. **Implement Converters** - Add parsing for your custom data format (if needed)
+5. **Map CNCPipe APIs** - Replace TODOs in `ApplySettings()` with actual API calls
+6. **Test End-to-End** - Verify Teensy?App?CNCPipe communication
+
+---
+
+## Troubleshooting Checklist
+
+- [ ] Teensy connected via USB and showing in Device Manager
+- [ ] Correct COM port visible in application output
+- [ ] Teensy firmware outputs "TEENSY_OCP_001" in setup()
+- [ ] Serial Monitor confirms Teensy output
+- [ ] Handshake successful message appears
+- [ ] Data is being received ("Received:" messages appear)
+- [ ] JSON/CSV format is correct
+- [ ] CNCPipe ApplySettings() methods are implemented
+
+---
+
+## Advanced: Custom Handshake
+
+To use a different handshake identifier:
+
+```csharp
+// In TeensySerialManager
+private const string TEENSY_HANDSHAKE_ID = "YOUR_CUSTOM_ID";
+```
+
+Then update your Teensy firmware to output that identifier.
+
+---
+
+## Support
+
+For issues with:
+- **Serial Communication** ? Windows Device Manager COM ports
+- **CentroidAPI** ? Reference CentroidAPI documentation
+- **Teensy Firmware** ? See PJRC Teensy and Teensyduino documentation
+

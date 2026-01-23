@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "059t7IHKW7A=",
+  "success": true,
+  "projectFilePath": "/Users/timber/Documents/SoftwareDev/source/repos/CNC-OPC-Console/CNC-OPC-Console/CNC-OPC-Console.csproj",
+  "expectedPackageFiles": [
+    "/Users/timber/.nuget/packages/hidsharp/2.6.4/hidsharp.2.6.4.nupkg.sha512",
+    "/Users/timber/.nuget/packages/microsoft.netcore.platforms/2.0.0/microsoft.netcore.platforms.2.0.0.nupkg.sha512",
+    "/Users/timber/.nuget/packages/microsoft.win32.registry/4.5.0/microsoft.win32.registry.4.5.0.nupkg.sha512",
+    "/Users/timber/.nuget/packages/system.io.ports/4.5.0/system.io.ports.4.5.0.nupkg.sha512",
+    "/Users/timber/.nuget/packages/system.security.accesscontrol/4.5.0/system.security.accesscontrol.4.5.0.nupkg.sha512",
+    "/Users/timber/.nuget/packages/system.security.principal.windows/4.5.0/system.security.principal.windows.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}

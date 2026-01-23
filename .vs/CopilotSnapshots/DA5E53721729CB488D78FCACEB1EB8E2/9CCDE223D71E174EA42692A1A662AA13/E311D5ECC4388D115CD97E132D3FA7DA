@@ -1,0 +1,257 @@
+﻿# CNC Teensy HID to CentroidAPI Implementation Guide
+
+## Overview
+
+This console application bridges **Teensy HID (Human Interface Device)** communication with the **CentroidAPI CNCPipe** for CNC machine control.
+
+### Architecture
+
+```
+Teensy Device (via USB HID)
+         ↓
+    HidLibrary
+         ↓
+  TeensyHidManager (Connection & Reading)
+         ↓
+  HidToSettingsConverter (Data Parsing)
+         ↓
+  ApplySettings() (CNCPipe Integration)
+         ↓
+    CNCPipe API
+         ↓
+    CNC Machine
+```
+
+---
+
+## Components
+
+### 1. **TeensyHidManager**
+Handles USB HID device connection and data reading.
+
+#### Configuration
+```csharp
+private const int TEENSY_VID = 0x16C0;  // Teensy default Vendor ID
+private const int TEENSY_PID = 0x0486;  // Teensy HID mode Product ID
+```
+
+**To find your Teensy's VID/PID:**
+- Connect Teensy and run the app
+- The app will list all HID devices with their VID/PID
+- Update the constants above with your device's values
+
+#### Methods
+- `ConnectToDevice()` - Finds and opens the Teensy HID device
+- `ReadData()` - Reads HID data from the device (non-blocking, 1-second timeout)
+- `Disconnect()` - Cleanly closes the device connection
+
+---
+
+### 2. **HidToSettingsConverter**
+Converts raw HID bytes into CNC machine settings.
+
+#### Packet Format (Customizable)
+
+The default implementation expects:
+
+```
+Byte 0:     Command ID
+Byte 1-2:   Parameter 1 (16-bit, little-endian)
+Byte 3-4:   Parameter 2 (16-bit, little-endian)
+Byte 5-6:   Parameter 3 (16-bit, little-endian)
+Byte 7+:    Additional data
+```
+
+#### Default Command IDs
+
+| ID   | Command | Payload | Returns |
+|------|---------|---------|---------|
+| 0x01 | Spindle Speed | Bytes 1-2 (uint16) | `SpindleSpeed` |
+| 0x02 | Feed Rate | Bytes 1-2 (uint16) | `FeedRate` |
+| 0x03 | Axis Movement | Bytes 1-6 (int16 X, Y, Z) | `AxisX`, `AxisY`, `AxisZ` |
+| 0x04 | Tool Change | Byte 1 (uint8) | `ToolNumber` |
+| 0x05 | Emergency Stop | (no data) | `EmergencyStop=true` |
+| 0x0F | Debug Message | Bytes 1+ (ASCII string) | `DebugMessage` |
+
+#### Customizing Packet Format
+
+Edit the `Convert()` method in `HidToSettingsConverter`:
+
+```csharp
+public Dictionary<string, object>? Convert(byte[] hidData)
+{
+    // Example: Parse custom format
+    switch (hidData[0])
+    {
+        case 0x10: // Your custom command
+            if (hidData.Length >= 5)
+            {
+                int value1 = BitConverter.ToInt32(hidData, 1);
+                settings["CustomSetting"] = value1;
+            }
+            break;
+        // Add more cases...
+    }
+}
+```
+
+---
+
+### 3. **ApplySettings()**
+Maps parsed HID settings to CNCPipe API calls.
+
+#### Current Implementation (Template)
+
+```csharp
+static void ApplySettings(CNCPipe cncPipe, Dictionary<string, object> settings)
+{
+    foreach (var setting in settings)
+    {
+        Console.WriteLine($"  → {setting.Key}: {setting.Value}");
+        // TODO: Add CNCPipe API calls
+    }
+}
+```
+
+#### Example Integration
+
+```csharp
+if (setting.Key == "SpindleSpeed")
+    cncPipe.SetSpindleSpeed((double)setting.Value);
+else if (setting.Key == "FeedRate")
+    cncPipe.SetFeedRate((double)setting.Value);
+else if (setting.Key == "AxisX")
+    cncPipe.MoveAxisAbsolute("X", (double)setting.Value);
+else if (setting.Key == "EmergencyStop")
+    cncPipe.EmergencyStop();
+```
+
+---
+
+## Usage
+
+### Basic Usage
+
+```bash
+CNC-OPC-Console.exe
+```
+
+### Flow
+
+1. **Initialize** - Connects to CNCPipe and Teensy device
+2. **Listen** - Enters continuous loop reading HID data
+3. **Parse** - Converts HID packets to settings
+4. **Apply** - Sends settings to CNCPipe
+5. **Shutdown** - Press `Ctrl+C` to gracefully disconnect
+
+---
+
+## Teensy Firmware Example
+
+### Arduino/Teensyduino Code (C++)
+
+```cpp
+#include <Joystick.h>  // Use HID library for Teensy
+
+// Create HID device
+HIDReport report;
+
+void setup() {
+    Serial.begin(9600);
+}
+
+void loop() {
+    // Example: Send spindle speed command
+    uint8_t hidData[3] = {0x01, 0x80, 0x04};  // SpindleSpeed = 1152 RPM (0x0480)
+    
+    // Send via HID endpoint
+    report.sendData(hidData, 3);
+    
+    delay(100);
+}
+```
+
+---
+
+## Debugging
+
+### View Detected HID Devices
+
+The app automatically lists available HID devices if Teensy isn't found:
+
+```
+  Available HID Devices:
+    - USB Input Device (VID: 0x1234, PID: 0x5678)
+    - Keyboard (VID: 0xABCD, PID: 0xEF00)
+    ... and 2 more
+```
+
+### Enable Verbose Logging
+
+Edit `Program.cs` to log raw HID data:
+
+```csharp
+// In ReceiveAndProcessData()
+Console.WriteLine($"  Data: {BitConverter.ToString(hidData)}");
+```
+
+---
+
+## Troubleshooting
+
+### Device Not Found
+- **Issue**: "Teensy device not found"
+- **Solution**: 
+  - Verify Teensy is connected via USB
+  - Check Device Manager for the device
+  - Update VID/PID constants if using custom firmware
+
+### No Data Received
+- **Issue**: Application runs but shows no data
+- **Solution**:
+  - Verify Teensy firmware is sending HID data
+  - Check CableCheck HID tools (Windows) to monitor raw data
+  - Enable debug logging in `ReadData()`
+
+### CNCPipe Error
+- **Issue**: Settings parse but don't apply
+- **Solution**:
+  - Implement the TODO methods in `ApplySettings()`
+  - Verify CNCPipe API method names match your version
+  - Add error handling for each API call
+
+---
+
+## Performance Considerations
+
+- **Read Timeout**: 1000ms (configurable in `ReadData()`)
+- **Process Delay**: 50ms between reads (prevents CPU spinning)
+- **Buffer Size**: 64 bytes (standard HID packet size)
+
+Adjust these for your specific application needs.
+
+---
+
+## Dependencies
+
+- **CentroidAPI** - CNC machine control (local reference)
+- **HidLibrary v3.3.40** - USB HID communication (NuGet)
+
+---
+
+## Next Steps
+
+1. **Identify Teensy VID/PID** - Run app and note your device IDs
+2. **Define Packet Format** - Document your Teensy→PC HID packet structure
+3. **Implement Converters** - Add parsing logic for your custom packets
+4. **Map CNCPipe APIs** - Replace TODOs with actual CNCPipe calls
+5. **Test Integration** - Verify end-to-end communication
+
+---
+
+## Support
+
+For issues with:
+- **HID Communication** → Check HidLibrary docs or use Windows HID tools
+- **CentroidAPI** → Reference API documentation
+- **Teensy Firmware** → See PJRC Teensy documentation

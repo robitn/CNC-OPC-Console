@@ -1,0 +1,333 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using CentroidAPI;
+using HidLibrary;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        try
+        {
+            Console.WriteLine("CNC Teensy HID to CentroidAPI Console Application");
+            Console.WriteLine("==================================================\n");
+
+            // Initialize CNCPipe
+            var cncPipe = new CNCPipe();
+            Console.WriteLine("✓ CNCPipe initialized");
+
+            // Initialize Teensy HID device manager
+            var teensyManager = new TeensyHidManager();
+            Console.WriteLine("✓ Teensy HID Manager initialized");
+
+            // Connect to Teensy device
+            if (!teensyManager.ConnectToDevice())
+            {
+                Console.Error.WriteLine("✗ Failed to connect to Teensy device");
+                Console.WriteLine("\nTroubleshooting:");
+                Console.WriteLine("- Verify Teensy device is connected via USB");
+                Console.WriteLine("- Check Device Manager for Teensy HID device");
+                Console.WriteLine("- Ensure correct VID/PID in TeensyHidManager");
+                Environment.Exit(1);
+            }
+
+            Console.WriteLine("✓ Connected to Teensy device\n");
+
+            // Start receiving and processing data
+            var cts = new CancellationTokenSource();
+            var readTask = ReceiveAndProcessData(teensyManager, cncPipe, cts.Token);
+
+            // Handle Ctrl+C to gracefully shutdown
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true;
+                Console.WriteLine("\n\nShutting down gracefully...");
+                cts.Cancel();
+            };
+
+            await readTask;
+
+            teensyManager.Disconnect();
+            Console.WriteLine("✓ Disconnected from Teensy device");
+            Console.WriteLine("Application ended successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"\n✗ Error: {ex.Message}");
+            Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
+            Environment.Exit(1);
+        }
+    }
+
+    static async Task ReceiveAndProcessData(TeensyHidManager teensyManager, CNCPipe cncPipe, CancellationToken cancellationToken)
+    {
+        var dataConverter = new HidToSettingsConverter();
+
+        Console.WriteLine("Listening for Teensy HID data...\n");
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                // Read data from Teensy
+                var hidData = teensyManager.ReadData(cancellationToken);
+
+                if (hidData != null && hidData.Length > 0)
+                {
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Received {hidData.Length} bytes from Teensy");
+                    Console.WriteLine($"  Data: {BitConverter.ToString(hidData)}");
+
+                    // Convert HID data to CNC settings
+                    var settings = dataConverter.Convert(hidData);
+
+                    if (settings != null && settings.Count > 0)
+                    {
+                        Console.WriteLine($"Converted to {settings.Count} settings:");
+
+                        // Apply settings to CNCPipe
+                        ApplySettings(cncPipe, settings);
+                    }
+                }
+
+                // Small delay to prevent CPU spinning
+                await Task.Delay(50, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"✗ Error processing data: {ex.Message}");
+            }
+        }
+    }
+
+    static void ApplySettings(CNCPipe cncPipe, Dictionary<string, object> settings)
+    {
+        foreach (var setting in settings)
+        {
+            try
+            {
+                Console.WriteLine($"  → {setting.Key}: {setting.Value}");
+
+                // TODO: Map settings to CNCPipe API calls
+                // Example implementations:
+                // if (setting.Key == "SpindleSpeed")
+                //     cncPipe.SetSpindleSpeed((double)setting.Value);
+                // else if (setting.Key == "FeedRate")
+                //     cncPipe.SetFeedRate((double)setting.Value);
+                // else if (setting.Key == "AxisX")
+                //     cncPipe.MoveAxis(Axis.X, (double)setting.Value);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"  ✗ Failed to apply {setting.Key}: {ex.Message}");
+            }
+        }
+    }
+}
+
+/// <summary>
+/// Manages connection and communication with Teensy HID device using HidLibrary
+/// </summary>
+class TeensyHidManager
+{
+    private const int TEENSY_VID = 0x16C0;  // Teensy default VID (PJRC)
+    private const int TEENSY_PID = 0x0486;  // Teensy HID mode default PID
+    
+    private HidDevice? _hidDevice;
+
+    public bool ConnectToDevice()
+    {
+        try
+        {
+            // Find all HID devices
+            var devices = HidDevices.Enumerate();
+            
+            // Look for Teensy device with matching VID/PID
+            _hidDevice = devices.FirstOrDefault(d => 
+                d.Attributes.VendorId == TEENSY_VID && 
+                d.Attributes.ProductId == TEENSY_PID);
+
+            if (_hidDevice == null)
+            {
+                Console.WriteLine($"  ✗ Teensy device not found (VID: 0x{TEENSY_VID:X4}, PID: 0x{TEENSY_PID:X4})");
+                Console.WriteLine("\n  Available HID Devices:");
+                
+                foreach (var device in devices.Take(5))
+                {
+                    Console.WriteLine($"    - {device.Description} (VID: 0x{device.Attributes.VendorId:X4}, PID: 0x{device.Attributes.ProductId:X4})");
+                }
+                
+                if (devices.Count() > 5)
+                    Console.WriteLine($"    ... and {devices.Count() - 5} more");
+                
+                return false;
+            }
+
+            // Open the device for reading
+            if (!_hidDevice.IsOpen)
+            {
+                _hidDevice.OpenDevice();
+            }
+
+            if (!_hidDevice.IsConnected)
+            {
+                Console.WriteLine("✗ Failed to open HID device");
+                return false;
+            }
+
+            Console.WriteLine($"  Device: {_hidDevice.Description}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"✗ Connection error: {ex.Message}");
+            return false;
+        }
+    }
+
+    public byte[]? ReadData(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (_hidDevice == null || !_hidDevice.IsConnected)
+                return null;
+
+            // Use HidDevice's read method with timeout
+            HidDeviceData readData = _hidDevice.Read(1000); // 1 second timeout
+
+            if (readData.Status == HidDeviceStatus.Success && readData.Data.Length > 0)
+            {
+                return readData.Data;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"✗ Read error: {ex.Message}");
+            return null;
+        }
+    }
+
+    public void Disconnect()
+    {
+        try
+        {
+            if (_hidDevice != null && _hidDevice.IsOpen)
+            {
+                _hidDevice.CloseDevice();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"✗ Disconnect error: {ex.Message}");
+        }
+    }
+}
+
+/// <summary>
+/// Converts raw HID data into CNC machine settings
+/// 
+/// CUSTOMIZATION GUIDE:
+/// This converter assumes your Teensy sends HID packets with a specific structure.
+/// Modify the Convert() method based on your actual Teensy firmware packet format.
+/// </summary>
+class HidToSettingsConverter
+{
+    /// <summary>
+    /// Convert raw HID bytes to machine settings dictionary
+    /// 
+    /// === CUSTOMIZE THIS BASED ON YOUR TEENSY FIRMWARE ===
+    /// 
+    /// Example HID packet structure:
+    /// Byte 0: Command ID (0x01=Spindle, 0x02=Feed, 0x03=Axes, etc.)
+    /// Byte 1-2: Parameter 1 (16-bit value, little-endian)
+    /// Byte 3-4: Parameter 2 (16-bit value, little-endian)
+    /// Byte 5-6: Parameter 3 (16-bit value, little-endian)
+    /// Byte 7+: Additional data
+    /// </summary>
+    public Dictionary<string, object>? Convert(byte[] hidData)
+    {
+        if (hidData == null || hidData.Length < 1)
+            return null;
+
+        var settings = new Dictionary<string, object>();
+
+        try
+        {
+            byte commandId = hidData[0];
+
+            switch (commandId)
+            {
+                case 0x01: // Spindle Speed (2 bytes)
+                    if (hidData.Length >= 3)
+                    {
+                        ushort spindleSpeed = BitConverter.ToUInt16(hidData, 1);
+                        settings["SpindleSpeed"] = spindleSpeed;
+                    }
+                    break;
+
+                case 0x02: // Feed Rate (2 bytes)
+                    if (hidData.Length >= 3)
+                    {
+                        ushort feedRate = BitConverter.ToUInt16(hidData, 1);
+                        settings["FeedRate"] = feedRate;
+                    }
+                    break;
+
+                case 0x03: // Multi-axis Movement (6 bytes)
+                    if (hidData.Length >= 7)
+                    {
+                        short axisX = BitConverter.ToInt16(hidData, 1);
+                        short axisY = BitConverter.ToInt16(hidData, 3);
+                        short axisZ = BitConverter.ToInt16(hidData, 5);
+                        
+                        settings["AxisX"] = axisX;
+                        settings["AxisY"] = axisY;
+                        settings["AxisZ"] = axisZ;
+                    }
+                    break;
+
+                case 0x04: // Tool Change (1 byte)
+                    if (hidData.Length >= 2)
+                    {
+                        settings["ToolNumber"] = hidData[1];
+                    }
+                    break;
+
+                case 0x05: // Emergency Stop
+                    settings["EmergencyStop"] = true;
+                    break;
+
+                case 0x0F: // Debug/Status Info
+                    // Parse remaining bytes as ASCII for debug messages
+                    if (hidData.Length > 1)
+                    {
+                        string message = System.Text.Encoding.ASCII.GetString(hidData, 1, hidData.Length - 1).TrimEnd('\0');
+                        settings["DebugMessage"] = message;
+                    }
+                    break;
+
+                default:
+                    // Unknown command - log it
+                    settings["UnknownCommand"] = commandId;
+                    settings["DataLength"] = hidData.Length;
+                    settings["RawData"] = BitConverter.ToString(hidData);
+                    break;
+            }
+
+            return settings.Count > 0 ? settings : null;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"✗ Conversion error: {ex.Message}");
+            return null;
+        }
+    }
+}
