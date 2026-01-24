@@ -12,6 +12,7 @@ public partial class Program
 {
     private static CNCPipe? _cncPipe;
     private static CNCPipe.Job? _cncJob;
+    private static CNCPipe.Parameter? _cncParameter;
 
     static async Task Main(string[] args)
     {
@@ -42,6 +43,11 @@ public partial class Program
             Console.WriteLine("[INIT] Initializing CNCPipe.Job...");
             _cncJob = new CNCPipe.Job(_cncPipe);
             Console.WriteLine("✓ CNCPipe.Job initialized");
+
+            // Initialize CNCPipe.Parameter once for reuse throughout application
+            Console.WriteLine("[INIT] Initializing CNCPipe.Parameter...");
+            _cncParameter = new CNCPipe.Parameter(_cncPipe);
+            Console.WriteLine("✓ CNCPipe.Parameter initialized");
 
             // Initialize Teensy device manager via Serial
             Console.WriteLine("[INIT] Creating TeensySerialManager...");
@@ -249,6 +255,10 @@ public partial class Program
                 settings.Remove("encoder_deltaZ");
                 // Also remove feedrate if used
                 settings.Remove("feedrate_value");
+                // Optionally remove individual encoder positions if present
+                settings.Remove("encoder_posX");
+                settings.Remove("encoder_posY");
+                settings.Remove("encoder_posZ");
             }
             catch (Exception ex)
             {

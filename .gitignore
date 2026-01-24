@@ -3,7 +3,8 @@
 *.log
 bin
 obj
-CNC_OPC_Console.sln
 bin/
 obj/
 CNC-OCP-Console.code-workspace
+CNC_OCP_Console.sln
+CNC-OCP-Console.csproj
