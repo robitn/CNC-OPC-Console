@@ -10,6 +10,7 @@ using CentroidAPI;
 /// </summary>
 public partial class Program
 {
+    private static CNCPipe? _cncPipe;
     private static CNCPipe.Job? _cncJob;
 
     static async Task Main(string[] args)
@@ -21,11 +22,11 @@ public partial class Program
 
             // Initialize CNCPipe
             Console.WriteLine("[INIT] Creating CNCPipe...");
-            var cncPipe = new CNCPipe();
+            _cncPipe = new CNCPipe();
             Console.Out.Flush();
 
             // Validate CNCPipe was properly constructed
-            if (!cncPipe.IsConstructed())
+            if (!_cncPipe.IsConstructed())
             {
                 Console.Error.WriteLine("? CNCPipe failed to initialize properly");
                 Console.WriteLine("\nTroubleshooting:");
@@ -39,7 +40,7 @@ public partial class Program
 
             // Initialize CNCPipe.Job once for reuse throughout application
             Console.WriteLine("[INIT] Initializing CNCPipe.Job...");
-            _cncJob = new CNCPipe.Job(cncPipe);
+            _cncJob = new CNCPipe.Job(_cncPipe);
             Console.WriteLine("✓ CNCPipe.Job initialized");
 
             // Initialize Teensy device manager via Serial
@@ -63,7 +64,7 @@ public partial class Program
 
             // Start receiving and processing data with auto-reconnection
             var cts = new CancellationTokenSource();
-            var readTask = ReceiveAndProcessDataWithReconnection(teensyManager, cncPipe, cts.Token);
+            var readTask = ReceiveAndProcessDataWithReconnection(teensyManager, cts.Token);
 
             // Handle Ctrl+C to gracefully shutdown
             Console.CancelKeyPress += (s, e) =>
@@ -87,7 +88,7 @@ public partial class Program
         }
     }
 
-    static async Task ReceiveAndProcessDataWithReconnection(TeensySerialManager teensyManager, CNCPipe cncPipe, CancellationToken cancellationToken)
+    static async Task ReceiveAndProcessDataWithReconnection(TeensySerialManager teensyManager, CancellationToken cancellationToken)
     {
         var dataConverter = new SerialToSettingsConverter();
         var displayService = new DataDisplayService();
@@ -155,7 +156,7 @@ public partial class Program
                 if (settings != null && settings.Count > 0)
                 {
                     displayService.DisplaySettings(settings);
-                    ApplySettings(cncPipe, settings);
+                    ApplySettings(settings);
                 }
             }
             catch (OperationCanceledException)
@@ -230,7 +231,7 @@ public partial class Program
         },
     };
 
-    static void ApplySettings(CNCPipe cncPipe, Dictionary<string, object> settings)
+    static void ApplySettings(Dictionary<string, object> settings)
     {
         // Handle combined encoder delta move (G-Code generation)
         if (settings.TryGetValue("encoder_deltaX", out var deltaX) &&
@@ -240,7 +241,7 @@ public partial class Program
             try
             {
                 var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
-                cncPipe.job.RunCommand(gcode, false);
+                _cncJob?.RunCommand(gcode, false);
 
                 // Remove processed keys
                 settings.Remove("encoder_deltaX");
@@ -260,9 +261,9 @@ public partial class Program
         {
             try
             {
-                if (SettingMappers.TryGetValue(setting.Key, out var mapper))
+                if (SettingMappers.TryGetValue(setting.Key, out var mapper) && _cncPipe != null)
                 {
-                    mapper(cncPipe, setting.Value);
+                    mapper(_cncPipe, setting.Value);
                 }
                 else
                 {
