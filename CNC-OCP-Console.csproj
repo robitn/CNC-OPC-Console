@@ -13,4 +13,9 @@
     <PackageReference Include="System.IO.Ports" Version="4.5.0" />
   </ItemGroup>
 
+  <!-- Include CentroidAPI.cs stub only on Windows where real CentroidAPI.dll is available -->
+  <ItemGroup Condition="'$(OS)' != 'Unix'">
+    <Compile Include="CentroidAPI.cs" />
+  </ItemGroup>
+
 </Project>
