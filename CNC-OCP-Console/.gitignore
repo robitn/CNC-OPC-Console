@@ -3,3 +3,4 @@ obj/*
 bin/*
 CNC-OCP-Console.code-workspace
 CNC-OCP-Console.sln
+CNC-OPC-Console.csproj

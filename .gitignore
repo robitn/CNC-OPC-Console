@@ -1,6 +1,8 @@
 .DS_Store
 .vs/**
 *.log
+bin
+obj
 CNC_OPC_Console.slnx
 CNC-OCP-Console/bin/**
 CNC-OCP-Console/obj/**
