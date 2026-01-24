@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using CentroidAPI;
 
 /// <summary>
 /// Main application entry point - coordinates initialization and data flow
 /// Responsible for orchestration only, delegates to specialized managers
 /// </summary>
-class Program
+public partial class Program
 {
     static async Task Main(string[] args)
     {
@@ -174,13 +173,13 @@ class Program
         ["step_size"] = (cnc, value) => { /* Informational - step_index is used */ },
         ["Command"] = (cnc, value) => { /* Fallback parser - ignore */ },
         ["Value"] = (cnc, value) => { /* Fallback parser - ignore */ },
-        
+
         // Feedrate control
         ["feedrate_value"] = (cnc, value) =>
         {
             // TODO: if (value is double d) cnc.state.SetFeedRate(d);
         },
-        
+
         // Switch mappings (map to appropriate PLC bits)
         ["switch_enabled"] = (cnc, value) =>
         {
@@ -202,13 +201,13 @@ class Program
         {
             // TODO: if (value is bool b) cnc.plc.SetPlcBit(5, b);
         },
-        
+
         // Jog step size control
         ["step_index"] = (cnc, value) =>
         {
             // TODO: if (value is int i) cnc.parameter.SetMachineParameter(xxx, i);
         },
-        
+
         // Encoder positions (if used separately from deltas)
         ["encoder_posX"] = (cnc, value) =>
         {
@@ -234,8 +233,8 @@ class Program
             try
             {
                 var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
-                cncPipe.job.RunCommand(gcode);
-                
+                cncPipe.job.RunCommand(gcode, false);
+
                 // Remove processed keys
                 settings.Remove("encoder_deltaX");
                 settings.Remove("encoder_deltaY");

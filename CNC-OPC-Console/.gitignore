@@ -1,4 +1,5 @@
 .DS_Store
 obj/*
 bin/*
-CNC-OCP_Console.scprog
+CNC-OPC-Console.code-workspace
+CNC-OPC-Console.sln

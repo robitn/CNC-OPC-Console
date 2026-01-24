@@ -46,7 +46,13 @@ namespace CentroidAPI
             public ReturnCode StartJob(string jobName) { System.Console.WriteLine($"[Mock] StartJob({jobName})"); return ReturnCode.SUCCESS; }
             public ReturnCode StopJob() { System.Console.WriteLine("[Mock] StopJob()"); return ReturnCode.SUCCESS; }
             public ReturnCode GetJobStatus(out string status) { status = "Idle"; System.Console.WriteLine("[Mock] GetJobStatus(out string)"); return ReturnCode.SUCCESS; }
-            public ReturnCode RunCommand(string gcode) { System.Console.WriteLine($"[Mock] RunCommand({gcode})"); return ReturnCode.SUCCESS; }
+            public ReturnCode RunCommand(string gcode, bool require_cycles_start) { System.Console.WriteLine($"[Mock] RunCommand({gcode})"); return ReturnCode.SUCCESS; }
+            public ReturnCode RunCommand(string gcode, string cnc12_working_directory, bool require_cycle_start = true) { System.Console.WriteLine($"[Mock] RunCommand({gcode}, {cnc12_working_directory}, {require_cycle_start})"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetUserSystemVariable(int variable_number, out double value) { value = 0; System.Console.WriteLine($"[Mock] GetUserSystemVariable({variable_number}, out double)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetSystemVariable(int variable_number, out double value) { value = 0; System.Console.WriteLine($"[Mock] GetSystemVariable({variable_number}, out double)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetSystemVariable(int variable_number, out string value) { value = "dweeble"; System.Console.WriteLine($"[Mock] GetSystemVariable({variable_number}, out string)"); return ReturnCode.SUCCESS; }
+            public ReturnCode SetSystemVariable(int variable_number, double value) { System.Console.WriteLine($"[Mock] SetSystemVariable({variable_number}, {value})"); return ReturnCode.SUCCESS; }
+            public ReturnCode SetSystemVariable(int variable_number, string value) { System.Console.WriteLine($"[Mock] SetSystemVariable({variable_number}, {value})"); return ReturnCode.SUCCESS; }
         }
         public class MessageWindow { }
         public class Parameter
