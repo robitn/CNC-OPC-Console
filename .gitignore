@@ -4,7 +4,6 @@
 bin
 obj
 CNC_OPC_Console.slnx
-CNC-OCP-Console/bin/**
-CNC-OCP-Console/obj/**
-CNC-OCP-Console/CNC-OCP-Console.code-workspace
+bin/
+obj/
 CNC-OCP-Console.code-workspace
