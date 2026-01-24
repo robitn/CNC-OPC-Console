@@ -1,9 +1,9 @@
 .DS_Store
-.vs/**
+.vs/
 *.log
 bin
 obj
-CNC_OPC_Console.slnx
+CNC_OPC_Console.sln
 bin/
 obj/
 CNC-OCP-Console.code-workspace
