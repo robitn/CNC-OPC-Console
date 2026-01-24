@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using CNC_OPC_Console.Configuration;
 
 /// <summary>
 /// Converts serial data (JSON and text) into CNC machine settings
@@ -12,7 +13,10 @@ class SerialToSettingsConverter
     /// Convert serial CSV data to machine settings
     /// 
     /// Expected formats:
-    /// OCP CSV: TEENSY_OCP_001,1.0.0,0,0,0,4,1,25
+    /// OCP CSV (new): TEENSY_OCP_001,1.0.0,0,0,0,100,200,300,4,1,25
+    ///                (id,version,encX,encY,encZ,absX,absY,absZ,switches,stepIndex,feedrate)
+    /// OCP CSV (old): TEENSY_OCP_001,1.0.0,0,0,0,4,1,25
+    ///                (id,version,encX,encY,encZ,switches,stepIndex,feedrate)
     /// OCP JSON: {"ocp":{"device":{...},"switches":{...},"feedrate":{...},"encoders":{...}}}
     /// Generic JSON: {"command": "spindle", "value": 1200}
     /// CSV: SPINDLE,1200
@@ -176,6 +180,62 @@ class SerialToSettingsConverter
         return settings.Count > 0 ? settings : null;
     }
 
+    private void ParseOCPCsvData(string[] parts, Dictionary<string, object> settings)
+    {
+        // Parse device ID and version
+        settings["device_id"] = parts[0].Trim();
+
+        if (parts.Length > 1)
+            settings["device_version"] = parts[1].Trim();
+
+        // Parse encoder deltas
+        if (parts.Length > 2 && double.TryParse(parts[2].Trim(), out var encX))
+            settings["encoder_deltaX"] = encX;
+
+        if (parts.Length > 3 && double.TryParse(parts[3].Trim(), out var encY))
+            settings["encoder_deltaY"] = encY;
+
+        if (parts.Length > 4 && double.TryParse(parts[4].Trim(), out var encZ))
+            settings["encoder_deltaZ"] = encZ;
+
+        // Parse absolute encoder positions (new firmware)
+        if (parts.Length > 5 && double.TryParse(parts[5].Trim(), out var absX))
+            settings["encoder_posX"] = absX;
+
+        if (parts.Length > 6 && double.TryParse(parts[6].Trim(), out var absY))
+            settings["encoder_posY"] = absY;
+
+        if (parts.Length > 7 && double.TryParse(parts[7].Trim(), out var absZ))
+            settings["encoder_posZ"] = absZ;
+
+        // Parse switches (now at index 8)
+        if (parts.Length > 8 && int.TryParse(parts[8].Trim(), out var switches))
+        {
+            settings["switches_raw"] = switches;
+            settings["switch_enabled"] = (switches & 0x01) != 0;
+            settings["switch_feedhold"] = (switches & 0x02) != 0;
+            settings["switch_cycleStart"] = (switches & 0x04) != 0;
+            settings["switch_cycleStop"] = (switches & 0x08) != 0;
+            settings["switch_toolCheck"] = (switches & 0x10) != 0;
+        }
+
+        // Parse step index and size (now at index 9)
+        if (parts.Length > 9 && int.TryParse(parts[9].Trim(), out var stepIndex))
+        {
+            settings["step_index"] = stepIndex;
+            settings["step_size"] = ParserConfig.StepSizeMap.TryGetValue(stepIndex, out var size)
+                ? size
+                : ParserConfig.DefaultStepSize;
+        }
+
+        // Parse feedrate (now at index 10)
+        if (parts.Length > 10 && int.TryParse(parts[10].Trim(), out var feedrate))
+        {
+            settings["feedrate_value"] = feedrate;
+            settings["feedrate_percent"] = (feedrate / ParserConfig.MaxFeedrateValue) * 100.0;
+        }
+    }
+
     private Dictionary<string, object>? ParseCsv(string data)
     {
         var settings = new Dictionary<string, object>();
@@ -184,67 +244,15 @@ class SerialToSettingsConverter
         // Check if this is the Teensy OCP format (id,version,encX,encY,encZ,switches,stepIndex,feedrate)
         if (parts.Length >= 2 && parts[0].Trim().StartsWith("TEENSY_OCP"))
         {
-            // Parse Teensy OCP CSV format
-            settings["device_id"] = parts[0].Trim();
-
-            if (parts.Length > 1)
-                settings["device_version"] = parts[1].Trim();
-
-            if (parts.Length > 2 && int.TryParse(parts[2].Trim(), out var encX))
-                settings["encoder_deltaX"] = encX;
-
-            if (parts.Length > 3 && int.TryParse(parts[3].Trim(), out var encY))
-                settings["encoder_deltaY"] = encY;
-
-            if (parts.Length > 4 && int.TryParse(parts[4].Trim(), out var encZ))
-                settings["encoder_deltaZ"] = encZ;
-
-            if (parts.Length > 5 && int.TryParse(parts[5].Trim(), out var switches))
-            {
-                settings["switches_raw"] = switches;
-                settings["switch_enabled"] = (switches & 0x01) != 0;
-                settings["switch_feedhold"] = (switches & 0x02) != 0;
-                settings["switch_cycleStart"] = (switches & 0x04) != 0;
-                settings["switch_cycleStop"] = (switches & 0x08) != 0;
-                settings["switch_toolCheck"] = (switches & 0x10) != 0;
-            }
-
-            if (parts.Length > 6 && int.TryParse(parts[6].Trim(), out var stepIndex))
-            {
-                settings["step_index"] = stepIndex;
-                settings["step_size"] = stepIndex switch
-                {
-                    0 => "1x",
-                    1 => "10x",
-                    2 => "100x",
-                    _ => "unknown"
-                };
-            }
-
-            if (parts.Length > 7 && int.TryParse(parts[7].Trim(), out var feedrate))
-            {
-                settings["feedrate_value"] = feedrate;
-                settings["feedrate_percent"] = (feedrate / 255.0) * 100.0;
-            }
+            ParseOCPCsvData(parts, settings);
         }
-        else if (parts.Length >= 2)
+        else if (parts.Length >= 8)
         {
-            // Generic CSV format (COMMAND,VALUE)
-            string command = parts[0].Trim();
-            settings["Command"] = command;
-
-            for (int i = 1; i < parts.Length; i++)
-            {
-                string param = parts[i].Trim();
-                if (double.TryParse(param, out var value))
-                {
-                    settings[$"Param{i}"] = value;
-                }
-                else
-                {
-                    settings[$"Param{i}"] = param;
-                }
-            }
+            // Generic CSV format - try to map to Teensy OCP format structure
+            // Supports both old (8 fields) and new (11 fields) formats:
+            // Old: deviceId,version,encX,encY,encZ,switches,stepIndex,feedrate
+            // New: deviceId,version,encX,encY,encZ,absX,absY,absZ,switches,stepIndex,feedrate
+            ParseOCPCsvData(parts, settings);
         }
 
         return settings.Count > 0 ? settings : null;

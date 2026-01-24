@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using CentroidAPI;
 
 /// <summary>
@@ -163,19 +164,119 @@ class Program
         }
     }
 
+    private static readonly Dictionary<string, Action<CNCPipe, object>> SettingMappers = new()
+    {
+        // Informational settings (no CNC action required)
+        ["device_id"] = (cnc, value) => { /* Informational only */ },
+        ["device_version"] = (cnc, value) => { /* Informational only */ },
+        ["switches_raw"] = (cnc, value) => { /* Raw value - individual switches handled below */ },
+        ["feedrate_percent"] = (cnc, value) => { /* Derived from feedrate_value */ },
+        ["step_size"] = (cnc, value) => { /* Informational - step_index is used */ },
+        ["Command"] = (cnc, value) => { /* Fallback parser - ignore */ },
+        ["Value"] = (cnc, value) => { /* Fallback parser - ignore */ },
+        
+        // Feedrate control
+        ["feedrate_value"] = (cnc, value) =>
+        {
+            // TODO: if (value is double d) cnc.state.SetFeedRate(d);
+        },
+        
+        // Switch mappings (map to appropriate PLC bits)
+        ["switch_enabled"] = (cnc, value) =>
+        {
+            // TODO: if (value is bool b) cnc.plc.SetPlcBit(1, b);
+        },
+        ["switch_feedhold"] = (cnc, value) =>
+        {
+            // TODO: if (value is bool b) cnc.plc.SetPlcBit(2, b);
+        },
+        ["switch_cycleStart"] = (cnc, value) =>
+        {
+            // TODO: if (value is bool b) cnc.plc.SetPlcBit(3, b);
+        },
+        ["switch_cycleStop"] = (cnc, value) =>
+        {
+            // TODO: if (value is bool b) cnc.plc.SetPlcBit(4, b);
+        },
+        ["switch_toolCheck"] = (cnc, value) =>
+        {
+            // TODO: if (value is bool b) cnc.plc.SetPlcBit(5, b);
+        },
+        
+        // Jog step size control
+        ["step_index"] = (cnc, value) =>
+        {
+            // TODO: if (value is int i) cnc.parameter.SetMachineParameter(xxx, i);
+        },
+        
+        // Encoder positions (if used separately from deltas)
+        ["encoder_posX"] = (cnc, value) =>
+        {
+            // TODO: if (value is double d) cnc.dro.SetDroValue(1, d);
+        },
+        ["encoder_posY"] = (cnc, value) =>
+        {
+            // TODO: if (value is double d) cnc.dro.SetDroValue(2, d);
+        },
+        ["encoder_posZ"] = (cnc, value) =>
+        {
+            // TODO: if (value is double d) cnc.dro.SetDroValue(3, d);
+        },
+    };
+
     static void ApplySettings(CNCPipe cncPipe, Dictionary<string, object> settings)
     {
+        // Handle combined encoder delta move (G-Code generation)
+        if (settings.TryGetValue("encoder_deltaX", out var deltaX) &&
+            settings.TryGetValue("encoder_deltaY", out var deltaY) &&
+            settings.TryGetValue("encoder_deltaZ", out var deltaZ))
+        {
+            try
+            {
+                var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
+                cncPipe.job.RunCommand(gcode);
+                
+                // Remove processed keys
+                settings.Remove("encoder_deltaX");
+                settings.Remove("encoder_deltaY");
+                settings.Remove("encoder_deltaZ");
+                // Also remove feedrate if used
+                settings.Remove("feedrate_value");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"  ? Failed to apply encoder deltas: {ex.Message}");
+            }
+        }
+
+        // Handle remaining individual settings
         foreach (var setting in settings)
         {
             try
             {
-                // TODO: Map OCP settings to CentroidAPI calls
-                // Example: if (setting.Key == "feedrate_value") { cncPipe.SetFeedrate(setting.Value); }
+                if (SettingMappers.TryGetValue(setting.Key, out var mapper))
+                {
+                    mapper(cncPipe, setting.Value);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"  ! No mapping defined for setting: {setting.Key}");
+                }
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"  ? Failed to apply {setting.Key}: {ex.Message}");
             }
         }
+    }
+
+    private static string GenerateG1Move(double dx, double dy, double dz, Dictionary<string, object> settings)
+    {
+        var gcode = $"G1 X{dx} Y{dy} Z{dz}";
+        if (settings.TryGetValue("feedrate_value", out var feedrate))
+        {
+            gcode += $" F{feedrate}";
+        }
+        return gcode;
     }
 }

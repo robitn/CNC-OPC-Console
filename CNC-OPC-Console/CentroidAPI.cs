@@ -46,6 +46,7 @@ namespace CentroidAPI
             public ReturnCode StartJob(string jobName) { System.Console.WriteLine($"[Mock] StartJob({jobName})"); return ReturnCode.SUCCESS; }
             public ReturnCode StopJob() { System.Console.WriteLine("[Mock] StopJob()"); return ReturnCode.SUCCESS; }
             public ReturnCode GetJobStatus(out string status) { status = "Idle"; System.Console.WriteLine("[Mock] GetJobStatus(out string)"); return ReturnCode.SUCCESS; }
+            public ReturnCode RunCommand(string gcode) { System.Console.WriteLine($"[Mock] RunCommand({gcode})"); return ReturnCode.SUCCESS; }
         }
         public class MessageWindow { }
         public class Parameter

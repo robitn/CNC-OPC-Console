@@ -1,0 +1,7 @@
+.DS_Store
+.vs/**
+*.log
+CNC_OPC_Console.slnx
+CNC-OPC-Console/bin/**
+CNC-OPC-Console/obj/**
+CNC-OPC-Console/CNC-OPC-Console.code-workspace

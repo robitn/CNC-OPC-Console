@@ -17,3 +17,4 @@
 /Users/timber/Documents/SoftwareDev/source/repos/CNC-OPC-Console/CNC-OPC-Console/obj/Debug/net9.0/CNC-OPC-Console.pdb
 /Users/timber/Documents/SoftwareDev/source/repos/CNC-OPC-Console/CNC-OPC-Console/obj/Debug/net9.0/CNC-OPC-Console.genruntimeconfig.cache
 /Users/timber/Documents/SoftwareDev/source/repos/CNC-OPC-Console/CNC-OPC-Console/obj/Debug/net9.0/ref/CNC-OPC-Console.dll
+/Users/timber/Documents/SoftwareDev/source/repos/CNC-OPC-Console/CNC-OPC-Console/obj/Debug/net9.0/CNC-OPC-Console.sourcelink.json
