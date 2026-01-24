@@ -126,7 +126,7 @@ public Dictionary<string, object>? Convert(string data)
 ### Basic Usage
 
 ```bash
-CNC-OPC-Console.exe
+CNC-OCP-Console.exe
 ```
 
 ### Expected Output

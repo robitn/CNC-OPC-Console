@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using CNC_OPC_Console.Configuration;
+using CNC_OCP_Console.Configuration;
 
 /// <summary>
 /// Converts serial data (JSON and text) into CNC machine settings

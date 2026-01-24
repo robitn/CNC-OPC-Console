@@ -43,7 +43,7 @@ This application establishes a reliable communication bridge between:
 ## 📁 Project Structure
 
 ```
-CNC-OPC-Console/
+CNC-OCP-Console/
 ├── Configuration/
 │   └── ConnectionConfig.cs          # Connection parameters and constants
 ├── Converters/
@@ -57,7 +57,7 @@ CNC-OPC-Console/
 │   └── DataDisplayService.cs       # Throttled console output
 ├── Program.cs                       # Main application orchestration
 ├── CentroidAPI.cs                   # Centroid CNC API wrapper
-└── CNC-OPC-Console.csproj          # .NET 9.0 project file
+└── CNC-OCP-Console.csproj          # .NET 9.0 project file
 ```
 
 ## 🚀 Quick Start
@@ -74,7 +74,7 @@ CNC-OPC-Console/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd CNC-OPC-Console
+cd CNC-OCP-Console
 
 # Build the application
 dotnet build
@@ -87,7 +87,7 @@ dotnet build
 dotnet run
 
 # Or from the project directory
-cd CNC-OPC-Console
+cd CNC-OCP-Console
 dotnet run
 ```
 

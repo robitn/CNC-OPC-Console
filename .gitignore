@@ -2,7 +2,7 @@
 .vs/**
 *.log
 CNC_OPC_Console.slnx
-CNC-OPC-Console/bin/**
-CNC-OPC-Console/obj/**
-CNC-OPC-Console/CNC-OPC-Console.code-workspace
-CNC-OPC-Console.code-workspace
+CNC-OCP-Console/bin/**
+CNC-OCP-Console/obj/**
+CNC-OCP-Console/CNC-OCP-Console.code-workspace
+CNC-OCP-Console.code-workspace

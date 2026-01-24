@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CNC_OPC_Console.Configuration
+namespace CNC_OCP_Console.Configuration
 {
     /// <summary>
     /// Configuration for serial data parser mappings and constants
