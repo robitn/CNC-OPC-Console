@@ -10,6 +10,8 @@ using CentroidAPI;
 /// </summary>
 public partial class Program
 {
+    private static CNCPipe.Job? _cncJob;
+
     static async Task Main(string[] args)
     {
         try
@@ -34,6 +36,11 @@ public partial class Program
             }
 
             Console.WriteLine("✓ CNCPipe initialized and constructed");
+
+            // Initialize CNCPipe.Job once for reuse throughout application
+            Console.WriteLine("[INIT] Initializing CNCPipe.Job...");
+            _cncJob = new CNCPipe.Job(cncPipe);
+            Console.WriteLine("✓ CNCPipe.Job initialized");
 
             // Initialize Teensy device manager via Serial
             Console.WriteLine("[INIT] Creating TeensySerialManager...");

@@ -13,9 +13,16 @@
     <PackageReference Include="System.IO.Ports" Version="4.5.0" />
   </ItemGroup>
 
-  <!-- Include CentroidAPI.cs stub only on Windows where real CentroidAPI.dll is available -->
+  <!-- Exclude CentroidAPI.cs stub only on macOS for development -->
+  <ItemGroup Condition="'$(OS)' == 'Unix'">
+    <Compile Remove="CentroidAPI.cs" />
+  </ItemGroup>
+
+  <!-- Reference CentroidAPI.dll only on Windows -->
   <ItemGroup Condition="'$(OS)' != 'Unix'">
-    <Compile Include="CentroidAPI.cs" />
+    <Reference Include="CentroidAPI">
+      <HintPath>C:\cncm\CentroidAPI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
