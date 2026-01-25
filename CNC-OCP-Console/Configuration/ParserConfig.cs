@@ -10,11 +10,11 @@ namespace CNC_OCP_Console.Configuration
         /// <summary>
         /// Maps step index values to their human-readable size strings
         /// </summary>
-        public static readonly Dictionary<int, string> StepSizeMap = new()
+        public static readonly Dictionary<int, double> StepSizeMap = new()
         {
-            { 0, "0.01x" },
-            { 1, "0.1x" },
-            { 2, "1x" }
+            { 0, 0.01 },
+            { 1, 0.1 },
+            { 2, 1.0 }
         };
 
         /// <summary>

@@ -184,6 +184,7 @@ public partial class Program
         ["device_version"] = (cnc, value) => { /* Informational only */ },
         ["switches_raw"] = (cnc, value) => { /* Raw value - individual switches handled below */ },
         ["feedrate_percent"] = (cnc, value) => { /* Derived from feedrate_value */ },
+
         ["step_size"] = (cnc, value) => { /* Informational - step_index is used */ },
         ["Command"] = (cnc, value) => { /* Fallback parser - ignore */ },
         ["Value"] = (cnc, value) => { /* Fallback parser - ignore */ },
@@ -193,7 +194,6 @@ public partial class Program
         {
             // TODO: if (value is double d) cnc.state.SetFeedRate(d);
         },
-
         // Switch mappings (map to appropriate PLC bits)
         ["switch_enabled"] = (cnc, value) =>
         {
@@ -242,7 +242,8 @@ public partial class Program
         // Handle combined encoder delta move (G-Code generation)
         if (settings.TryGetValue("encoder_deltaX", out var deltaX) &&
             settings.TryGetValue("encoder_deltaY", out var deltaY) &&
-            settings.TryGetValue("encoder_deltaZ", out var deltaZ))
+            settings.TryGetValue("encoder_deltaZ", out var deltaZ) &&
+            settings.TryGetValue("step_size", out var stepSize))
         {
             try
             {
@@ -289,7 +290,11 @@ public partial class Program
 
     private static string GenerateG1Move(double dx, double dy, double dz, Dictionary<string, object> settings)
     {
-        var gcode = $"G1 X{dx} Y{dy} Z{dz}";
+        var stepSize = settings.ContainsKey("step_size") ? (double)settings["step_size"] : 0.01;
+        dx *= stepSize;
+        dy *= stepSize;
+        dz *= stepSize;
+        var gcode = $"G1 X{dx:#0.0####} Y{dy:#0.0####} Z{dz:#0.0####}";
         if (settings.TryGetValue("feedrate_value", out var feedrate))
         {
             gcode += $" F{feedrate}";
