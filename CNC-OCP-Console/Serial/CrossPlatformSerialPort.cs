@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - CrossPlatformSerialPort.cs
+ * Provides a cross-platform serial port wrapper for Windows and macOS.
+ * Unifies serial communication interface for the application.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.IO.Ports;
 using System.Linq;

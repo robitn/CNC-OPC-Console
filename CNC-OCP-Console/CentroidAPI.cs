@@ -1,3 +1,13 @@
+/*
+ * CNC-OCP-Console - CentroidAPI.cs
+ * Provides mock/stub API for Centroid CNC communication and data structures.
+ * Used for abstraction and testing of CNC operations.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
+
 namespace CentroidAPI
 {
     public class CNCPipe

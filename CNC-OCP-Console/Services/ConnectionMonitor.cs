@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - ConnectionMonitor.cs
+ * Monitors connection health and manages automatic reconnection for Teensy device.
+ * Handles connection lifecycle management.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.Threading;
 using System.Threading.Tasks;

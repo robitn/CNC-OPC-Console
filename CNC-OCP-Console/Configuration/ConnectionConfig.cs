@@ -1,3 +1,11 @@
+/*
+ * CNC-OCP-Console - ConnectionConfig.cs
+ * Defines configuration constants for Teensy connection and reconnection behavior.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 /// <summary>
 /// Configuration constants for Teensy connection and reconnection behavior
 /// </summary>

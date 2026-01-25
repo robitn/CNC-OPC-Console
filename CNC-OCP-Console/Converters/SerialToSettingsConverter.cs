@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - SerialToSettingsConverter.cs
+ * Converts serial data (CSV, JSON, text) into CNC machine settings.
+ * Handles parsing and conversion logic for incoming data.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.Collections.Generic;
 using System.Text.Json;

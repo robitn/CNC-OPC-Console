@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - TeensySerialManager.cs
+ * Manages connection and communication with Teensy OCP device via USB Serial.
+ * Handles reliable serial communication and message parsing.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;

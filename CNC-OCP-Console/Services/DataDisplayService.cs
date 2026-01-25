@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - DataDisplayService.cs
+ * Handles console display and throttling of OCP data for user interface.
+ * Responsible for data presentation and user feedback.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.Collections.Generic;
 

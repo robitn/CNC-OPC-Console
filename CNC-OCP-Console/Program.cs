@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - Program.cs
+ * Main application entry point for CNC OPC Console.
+ * Responsible for orchestration, initialization, and data flow coordination.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.Collections.Generic;
 using System.Threading;

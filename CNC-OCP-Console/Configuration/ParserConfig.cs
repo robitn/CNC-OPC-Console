@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - ParserConfig.cs
+ * Defines configuration and mappings for serial data parser.
+ * Contains constants and lookup tables for parsing logic.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System.Collections.Generic;
 
 namespace CNC_OCP_Console.Configuration

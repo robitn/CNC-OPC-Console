@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - WindowsSerialPort.cs
+ * Implements Windows serial port communication using System.IO.Ports.
+ * Provides platform-specific serial I/O for Windows.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.IO.Ports;
 

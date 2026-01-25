@@ -1,3 +1,12 @@
+/*
+ * CNC-OCP-Console - MacOSSerialPort.cs
+ * Implements native macOS serial port communication using POSIX APIs.
+ * Provides platform-specific serial I/O for macOS.
+ *
+ * Copyright (c) 2026 Timothy Robinson / Github: robitn. Licensed under the MIT License.
+ *
+ * This file is part of the CNC-OCP-Console project.
+ */
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
