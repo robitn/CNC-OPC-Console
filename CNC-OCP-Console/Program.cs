@@ -248,7 +248,11 @@ public partial class Program
             try
             {
                 var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
-                _cncJob?.RunCommand(gcode, false);
+                CNCPipe.ReturnCode returnCode = _cncJob?.RunCommand(gcode, false);
+                if (returnCode != CNCPipe.ReturnCode.SUCCESS)
+                {
+                    throw new Exception($"CNC command failed with code: {returnCode}");
+                }
 
                 // Remove processed keys
                 settings.Remove("encoder_deltaX");
