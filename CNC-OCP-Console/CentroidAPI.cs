@@ -18,51 +18,190 @@ namespace CentroidAPI
             public enum Direction { Positive, Negative }
             public enum Rate { Slow, Medium, Fast }
             public Axis(CNCPipe? parent = null) { }
-            public ReturnCode GetAccelTime(Axes axis, out double accel_time) { accel_time = 0; System.Console.WriteLine($"[Mock] GetAccelTime({axis}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetAxisReversal(Axes axis, out bool is_axis_reversed) { is_axis_reversed = false; System.Console.WriteLine($"[Mock] GetAxisReversal({axis}, out bool)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetCountsPerTurn(Axes axis, out double counts_per_turn) { counts_per_turn = 0; System.Console.WriteLine($"[Mock] GetCountsPerTurn({axis}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetDeadstartVelocity(Axes axis, out double deadstart_velocity) { deadstart_velocity = 0; System.Console.WriteLine($"[Mock] GetDeadstartVelocity({axis}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetDeltaVMax(Axes axis, out double delta_v_max) { delta_v_max = 0; System.Console.WriteLine($"[Mock] GetDeltaVMax({axis}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetHomeLimit(Axes axis, Direction direction, out double home_limit) { home_limit = 0; System.Console.WriteLine($"[Mock] GetHomeLimit({axis}, {direction}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetLabel(Axes axis, out char label) { label = 'X'; System.Console.WriteLine($"[Mock] GetLabel({axis}, out char)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetLashComp(Axes axis, out double lash_comp) { lash_comp = 0; System.Console.WriteLine($"[Mock] GetLashComp({axis}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetLimit(Axes axis, Direction direction, out double axis_limit) { axis_limit = 0; System.Console.WriteLine($"[Mock] GetLimit({axis}, {direction}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetPower(Axes axis, out MotorPower power_state) { power_state = MotorPower.Off; System.Console.WriteLine($"[Mock] GetPower({axis}, out MotorPower)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetRate(Axes axis, Rate jog_rate, out double rate) { rate = 0; System.Console.WriteLine($"[Mock] GetRate({axis}, {jog_rate}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetScalesCounts(Axes axis, out double scaling_counts) { scaling_counts = 0; System.Console.WriteLine($"[Mock] GetScalesCounts({axis}, out double)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetAccelTime(Axes axis, out double accel_time)
+            {
+                accel_time = 0;
+                System.Console.WriteLine($"[Mock] GetAccelTime({axis}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetAxisReversal(Axes axis, out bool is_axis_reversed)
+            {
+                is_axis_reversed = false;
+                System.Console.WriteLine($"[Mock] GetAxisReversal({axis}, out bool)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetCountsPerTurn(Axes axis, out double counts_per_turn)
+            {
+                counts_per_turn = 0;
+                System.Console.WriteLine($"[Mock] GetCountsPerTurn({axis}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetDeadstartVelocity(Axes axis, out double deadstart_velocity)
+            {
+                deadstart_velocity = 0;
+                System.Console.WriteLine($"[Mock] GetDeadstartVelocity({axis}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetDeltaVMax(Axes axis, out double delta_v_max)
+            {
+                delta_v_max = 0;
+                System.Console.WriteLine($"[Mock] GetDeltaVMax({axis}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetHomeLimit(Axes axis, Direction direction, out double home_limit)
+            {
+                home_limit = 0;
+                System.Console.WriteLine($"[Mock] GetHomeLimit({axis}, {direction}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetLabel(Axes axis, out char label)
+            {
+                label = 'X';
+                System.Console.WriteLine($"[Mock] GetLabel({axis}, out char)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetLashComp(Axes axis, out double lash_comp)
+            {
+                lash_comp = 0;
+                System.Console.WriteLine($"[Mock] GetLashComp({axis}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetLimit(Axes axis, Direction direction, out double axis_limit)
+            {
+                axis_limit = 0;
+                System.Console.WriteLine($"[Mock] GetLimit({axis}, {direction}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetPower(Axes axis, out MotorPower power_state)
+            {
+                power_state = MotorPower.Off;
+                System.Console.WriteLine($"[Mock] GetPower({axis}, out MotorPower)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetRate(Axes axis, Rate jog_rate, out double rate)
+            {
+                rate = 0;
+                System.Console.WriteLine($"[Mock] GetRate({axis}, {jog_rate}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetScalesCounts(Axes axis, out double scaling_counts)
+            {
+                scaling_counts = 0;
+                System.Console.WriteLine($"[Mock] GetScalesCounts({axis}, out double)");
+                return ReturnCode.SUCCESS;
+            }
             // Add more methods as needed from documentation
             public enum MotorPower { Off, On }
         }
         public class Csr
         {
             public Csr(CNCPipe? parent = null) { }
-            public ReturnCode DisableCSR() { System.Console.WriteLine("[Mock] DisableCSR()"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetAngle(out double angle) { angle = 0; System.Console.WriteLine("[Mock] GetAngle(out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetAngle(int wcs, out double csr_angle) { csr_angle = 0; System.Console.WriteLine($"[Mock] GetAngle({wcs}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode ReenableCSR() { System.Console.WriteLine("[Mock] ReenableCSR()"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetAngle(double angle) { System.Console.WriteLine($"[Mock] SetAngle({angle})"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetAngle(int wcs, double angle) { System.Console.WriteLine($"[Mock] SetAngle({wcs}, {angle})"); return ReturnCode.SUCCESS; }
+            public ReturnCode DisableCSR()
+            {
+                System.Console.WriteLine("[Mock] DisableCSR()");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetAngle(out double angle)
+            {
+                angle = 0;
+                System.Console.WriteLine("[Mock] GetAngle(out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetAngle(int wcs, out double csr_angle)
+            {
+                csr_angle = 0;
+                System.Console.WriteLine($"[Mock] GetAngle({wcs}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode ReenableCSR()
+            {
+                System.Console.WriteLine("[Mock] ReenableCSR()");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetAngle(double angle)
+            {
+                System.Console.WriteLine($"[Mock] SetAngle({angle})");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetAngle(int wcs, double angle)
+            {
+                System.Console.WriteLine($"[Mock] SetAngle({wcs}, {angle})");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class Dro
         {
             public Dro(CNCPipe? parent = null) { }
-            public ReturnCode GetDroValue(int dro_num, out double dro_value) { dro_value = 0; System.Console.WriteLine($"[Mock] GetDroValue({dro_num}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetDroValue(int dro_num, double dro_value) { System.Console.WriteLine($"[Mock] SetDroValue({dro_num}, {dro_value})"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetDroValue(int dro_num, out double dro_value)
+            {
+                dro_value = 0;
+                System.Console.WriteLine($"[Mock] GetDroValue({dro_num}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetDroValue(int dro_num, double dro_value)
+            {
+                System.Console.WriteLine($"[Mock] SetDroValue({dro_num}, {dro_value})");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class InboundComm { public class CommPacket { } }
         public class Job
         {
             public Job(CNCPipe? parent = null) { }
-            public ReturnCode StartJob(string jobName) { System.Console.WriteLine($"[Mock] StartJob({jobName})"); return ReturnCode.SUCCESS; }
-            public ReturnCode StopJob() { System.Console.WriteLine("[Mock] StopJob()"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetJobStatus(out string status) { status = "Idle"; System.Console.WriteLine("[Mock] GetJobStatus(out string)"); return ReturnCode.SUCCESS; }
-            public ReturnCode RunCommand(string gcode, bool require_cycles_start) { System.Console.WriteLine($"[Mock] RunCommand({gcode})"); return ReturnCode.SUCCESS; }
-            public ReturnCode RunCommand(string gcode, string cnc12_working_directory, bool require_cycle_start = true) { System.Console.WriteLine($"[Mock] RunCommand({gcode}, {cnc12_working_directory}, {require_cycle_start})"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetUserSystemVariable(int variable_number, out double value) { value = 0; System.Console.WriteLine($"[Mock] GetUserSystemVariable({variable_number}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetSystemVariable(int variable_number, out double value) { value = 0; System.Console.WriteLine($"[Mock] GetSystemVariable({variable_number}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetSystemVariable(int variable_number, out string value) { value = "dweeble"; System.Console.WriteLine($"[Mock] GetSystemVariable({variable_number}, out string)"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetSystemVariable(int variable_number, double value) { System.Console.WriteLine($"[Mock] SetSystemVariable({variable_number}, {value})"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetSystemVariable(int variable_number, string value) { System.Console.WriteLine($"[Mock] SetSystemVariable({variable_number}, {value})"); return ReturnCode.SUCCESS; }
+            public ReturnCode StartJob(string jobName)
+            {
+                System.Console.WriteLine($"[Mock] StartJob({jobName})");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode StopJob()
+            {
+                System.Console.WriteLine("[Mock] StopJob()");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetJobStatus(out string status)
+            {
+                status = "Idle";
+                System.Console.WriteLine("[Mock] GetJobStatus(out string)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode RunCommand(string gcode, bool require_cycles_start)
+            {
+                System.Console.WriteLine($"[Mock] RunCommand({gcode})");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode RunCommand(string gcode, string cnc12_working_directory, bool require_cycle_start = true)
+            {
+                System.Console.WriteLine($"[Mock] RunCommand({gcode}, {cnc12_working_directory}, {require_cycle_start})");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetUserSystemVariable(int variable_number, out double value)
+            {
+                value = 0;
+                System.Console.WriteLine($"[Mock] GetUserSystemVariable({variable_number}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetSystemVariable(int variable_number, out double value)
+            {
+                value = 0;
+                System.Console.WriteLine($"[Mock] GetSystemVariable({variable_number}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetSystemVariable(int variable_number, out string value)
+            {
+                value = "dweeble";
+                System.Console.WriteLine($"[Mock] GetSystemVariable({variable_number}, out string)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetSystemVariable(int variable_number, double value)
+            {
+                System.Console.WriteLine($"[Mock] SetSystemVariable({variable_number}, {value})");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetSystemVariable(int variable_number, string value)
+            {
+                System.Console.WriteLine($"[Mock] SetSystemVariable({variable_number}, {value})");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class MessageWindow { }
         public class Parameter
@@ -79,42 +218,99 @@ namespace CentroidAPI
                 System.Console.WriteLine($"[Mock] SetMachineParameter({parameter_num}, {value})");
                 return ReturnCode.SUCCESS;
             }
-            public ReturnCode GetParameterName(int parameter_num, out string name) { name = $"Param{parameter_num}"; System.Console.WriteLine($"[Mock] GetParameterName({parameter_num}, out string)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetParameterName(int parameter_num, out string name)
+            {
+                name = $"Param{parameter_num}";
+                System.Console.WriteLine($"[Mock] GetParameterName({parameter_num}, out string)");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class Plc
         {
             public Plc(CNCPipe? parent = null) { }
-            public ReturnCode GetPlcBit(int bit_num, out bool value) { value = false; System.Console.WriteLine($"[Mock] GetPlcBit({bit_num}, out bool)"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetPlcBit(int bit_num, bool value) { System.Console.WriteLine($"[Mock] SetPlcBit({bit_num}, {value})"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetSkinEventState(int event_num, out int state)
+            {
+                state = 0;
+                System.Console.WriteLine($"[Mock] GetSkinEventState({event_num}, out int)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetSkinEventState(int event_num, int state)
+            {
+                System.Console.WriteLine($"[Mock] SetSkinEventState({event_num}, {state})");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class Screen
         {
             public Screen(CNCPipe? parent = null) { }
-            public ReturnCode GetScreenInfo(out string info) { info = "MockScreen"; System.Console.WriteLine("[Mock] GetScreenInfo(out string)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetScreenInfo(out string info)
+            {
+                info = "MainScreen";
+                System.Console.WriteLine("[Mock] GetScreenInfo(out string)");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class State
         {
             public State(CNCPipe? parent = null) { }
-            public ReturnCode GetFeedRate(out double feedrate) { feedrate = 0; System.Console.WriteLine("[Mock] GetFeedRate(out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetSpindleSpeed(out double speed) { speed = 0; System.Console.WriteLine("[Mock] GetSpindleSpeed(out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode GetStateInfo(out string info) { info = "Idle"; System.Console.WriteLine("[Mock] GetStateInfo(out string)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetFeedRate(out double feedrate)
+            {
+                feedrate = 0;
+                System.Console.WriteLine("[Mock] GetFeedRate(out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetSpindleSpeed(out double speed)
+            {
+                speed = 0;
+                System.Console.WriteLine("[Mock] GetSpindleSpeed(out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode GetStateInfo(out string info)
+            {
+                info = "Idle";
+                System.Console.WriteLine("[Mock] GetStateInfo(out string)");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class Sys
         {
             public Sys(CNCPipe? parent = null) { }
-            public ReturnCode GetSystemInfo(out string info) { info = "MockSystem"; System.Console.WriteLine("[Mock] GetSystemInfo(out string)"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetSystemInfo(out string info)
+            {
+                info = "MockSystem";
+                System.Console.WriteLine("[Mock] GetSystemInfo(out string)");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class Tool
         {
             public Tool(CNCPipe? parent = null) { }
-            public ReturnCode GetToolNumber(out int toolNum) { toolNum = 0; System.Console.WriteLine("[Mock] GetToolNumber(out int)"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetToolNumber(int toolNum) { System.Console.WriteLine($"[Mock] SetToolNumber({toolNum})"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetToolNumber(out int toolNum)
+            {
+                toolNum = 0;
+                System.Console.WriteLine("[Mock] GetToolNumber(out int)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetToolNumber(int toolNum)
+            {
+                System.Console.WriteLine($"[Mock] SetToolNumber({toolNum})");
+                return ReturnCode.SUCCESS;
+            }
         }
         public class Wcs
         {
             public Wcs(CNCPipe? parent = null) { }
-            public ReturnCode GetWcsOffset(int wcsNum, out double offset) { offset = 0; System.Console.WriteLine($"[Mock] GetWcsOffset({wcsNum}, out double)"); return ReturnCode.SUCCESS; }
-            public ReturnCode SetWcsOffset(int wcsNum, double offset) { System.Console.WriteLine($"[Mock] SetWcsOffset({wcsNum}, {offset})"); return ReturnCode.SUCCESS; }
+            public ReturnCode GetWcsOffset(int wcsNum, out double offset)
+            {
+                offset = 0;
+                System.Console.WriteLine($"[Mock] GetWcsOffset({wcsNum}, out double)");
+                return ReturnCode.SUCCESS;
+            }
+            public ReturnCode SetWcsOffset(int wcsNum, double offset)
+            {
+                System.Console.WriteLine($"[Mock] SetWcsOffset({wcsNum}, {offset})");
+                return ReturnCode.SUCCESS;
+            }
         }
         // Visual Basic versions (stubs)
         public class VB_Axis { }

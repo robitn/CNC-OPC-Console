@@ -226,6 +226,8 @@ class SerialToSettingsConverter
             settings["switch_cycleStart"] = (switches & 0x04) != 0;
             settings["switch_cycleStop"] = (switches & 0x08) != 0;
             settings["switch_toolCheck"] = (switches & 0x10) != 0;
+            settings["switch_incContPressed"] = (switches & 0x20) != 0;
+            settings["switch_slowFastPressed"] = (switches & 0x40) != 0;
         }
 
         // Parse step index and size (now at index 9)

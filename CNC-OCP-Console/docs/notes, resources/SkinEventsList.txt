@@ -1,0 +1,108 @@
+Skin Events List
+;Maximum Number of Skin Events is 255
+
+SkinSpinOverPlus_M            IS SV_SKIN_EVENT_1  ; Row  1 Column 1
+SkinSpinAutoMan_M             IS SV_SKIN_EVENT_2  ; Row  1 Column 2
+SkinAux1_M                    IS SV_SKIN_EVENT_3  ; Row  1 Column 3
+SkinAux2_M                    IS SV_SKIN_EVENT_4  ; Row  1 Column 4
+SkinAux3_M                    IS SV_SKIN_EVENT_5  ; Row  1 Column 5
+SkinSpin100_M                 IS SV_SKIN_EVENT_6  ; Row  2 Column 1
+SkinSpinCW_M                  IS SV_SKIN_EVENT_7  ; Row  2 Column 2
+SkinAux4_M                    IS SV_SKIN_EVENT_8  ; Row  1 Column 6
+SkinAux5_M                    IS SV_SKIN_EVENT_9  ; Row  2 Column 3
+SkinAux6_M                    IS SV_SKIN_EVENT_10 ; Row  2 Column 4
+SkinSpinOverMinus_M           IS SV_SKIN_EVENT_11 ; Row  3 Column 1
+SkinSpinCCW_M                 IS SV_SKIN_EVENT_12 ; Row  3 Column 2
+SkinAux7_M                    IS SV_SKIN_EVENT_13 ; Row  2 Column 5
+SkinAux8_M                    IS SV_SKIN_EVENT_14 ; Row  2 Column 6
+SkinAux9_M                    IS SV_SKIN_EVENT_15 ; Row  3 Column 3
+SkinSpinStop_M                IS SV_SKIN_EVENT_16 ; Row  4 Column 1
+SkinSpinStart_M               IS SV_SKIN_EVENT_17 ; Row  4 Column 2
+SkinAux10_M                   IS SV_SKIN_EVENT_18 ; Row  3 Column 4
+SkinAux11_M                   IS SV_SKIN_EVENT_19 ; Row  3 Column 5
+SkinAux12_M                   IS SV_SKIN_EVENT_20 ; Row  3 Column 6
+SkinCoolAutoMan_M             IS SV_SKIN_EVENT_21 ; Row  5 Column 1
+SkinCoolFlood_M               IS SV_SKIN_EVENT_22 ; Row  5 Column 2
+SkinCoolMist_M                IS SV_SKIN_EVENT_23 ; Row  5 Column 3
+SkinVacOn_M                   IS SV_SKIN_EVENT_24 ; Row  5 Column 4
+SkinLimitDefeat_M             IS SV_SKIN_EVENT_25 ; Row  5 Column 5
+SkinIncCont_M                 IS SV_SKIN_EVENT_26 ; Row  6 Column 1
+SkinX1_M                      IS SV_SKIN_EVENT_27 ; Row  6 Column 2
+SkinX10_M                     IS SV_SKIN_EVENT_28 ; Row  6 Column 3
+SkinX100_M                    IS SV_SKIN_EVENT_29 ; Row  6 Column 4
+SkinMPG_M                     IS SV_SKIN_EVENT_30 ; Row  6 Column 5
+SkinJogAx4Plus_M              IS SV_SKIN_EVENT_31 ; Row  7 Column 1
+SkinR7C2_M                    IS SV_SKIN_EVENT_32 ; Row  7 Column 2
+SkinJogAx2Plus_M              IS SV_SKIN_EVENT_33 ; Row  7 Column 3
+SkinR7C4_M                    IS SV_SKIN_EVENT_34 ; Row  7 Column 4
+SkinJogAx3Plus_M              IS SV_SKIN_EVENT_35 ; Row  7 Column 5
+SkinR8C1_M                    IS SV_SKIN_EVENT_36 ; Row  8 Column 1
+SkinJogAx1Minus_M             IS SV_SKIN_EVENT_37 ; Row  8 Column 2
+SkinFastSlowJog_M             IS SV_SKIN_EVENT_38 ; Row  8 Column 3
+SkinJogAx1Plus_M              IS SV_SKIN_EVENT_39 ; Row  8 Column 4
+SkinR8C5_M                    IS SV_SKIN_EVENT_40 ; Row  8 Column 5
+SkinJogAx4Minus_M             IS SV_SKIN_EVENT_41 ; Row  9 Column 1
+SkinR9C2_M                    IS SV_SKIN_EVENT_42 ; Row  9 Column 2
+SkinJogAx2Minus_M             IS SV_SKIN_EVENT_43 ; Row  9 Column 3
+SkinR9C4_M                    IS SV_SKIN_EVENT_44 ; Row  9 Column 4
+SkinJogAx3Minus_M             IS SV_SKIN_EVENT_45 ; Row  9 Column 5
+SkinCycleCancel_M             IS SV_SKIN_EVENT_46 ; Row 10 Column 1
+SkinSingleBlock_M             IS SV_SKIN_EVENT_47 ; Row 10 Column 2
+SkinToolCheck_M               IS SV_SKIN_EVENT_48 ; Row 10 Column 3
+SkinFeedHold_M                IS SV_SKIN_EVENT_49 ; Row 10 Column 4
+SkinCycleStart_M              IS SV_SKIN_EVENT_50
+SkinResetOk_M                 IS SV_SKIN_EVENT_51
+SkinFeedOverMinus_M           IS SV_SKIN_EVENT_52
+SkinFeedOver100               IS SV_SKIN_EVENT_53
+SkinFeedOverPlus_M            IS SV_SKIN_EVENT_54
+KeepAlive_M                   IS SV_SKIN_EVENT_55
+SkinResetButtonPressed_M      IS SV_SKIN_EVENT_56
+OverrideRapidsEnabled_M       IS SV_SKIN_EVENT_58
+OverrideRapidsDisabled_M      IS SV_SKIN_EVENT_59
+VirtualJpRunning_M            IS SV_SKIN_EVENT_60
+UsingVirtualOverride_M        IS SV_SKIN_EVENT_61
+SkinResetSet_M                IS SV_SKIN_EVENT_62
+FeedOverLT100                 IS SV_SKIN_EVENT_63
+FeedOverEQ100                 IS SV_SKIN_EVENT_64
+FeedOverGT100                 IS SV_SKIN_EVENT_65
+SkinAux13_M                   IS SV_SKIN_EVENT_66  ; Row  4 Column 3
+SkinAux14_M                   IS SV_SKIN_EVENT_67  ; Row  4 Column 4
+SkinAux15_M                   IS SV_SKIN_EVENT_68  ; Row  4 Column 5
+SkinAux16_M                   IS SV_SKIN_EVENT_69  ; Row  4 Column 6
+SkinTailStock_M				  IS SV_SKIN_EVENT_70  ; Row  3 Column 5
+SkinOpenChuck_M				  IS SV_SKIN_EVENT_71  ; Row  4 Column 4
+SkinCloseChuck_M			  IS SV_SKIN_EVENT_72  ; Row  4 Column 5
+SkinWorklight_M				  IS SV_SKIN_EVENT_73
+SkinColletOpenClose_M		  IS SV_SKIN_EVENT_74
+SkinRouterAirBlow_M			  IS SV_SKIN_EVENT_75
+SkinSpindleHigh_M			  IS SV_SKIN_EVENT_76
+SkinSpindleMed_M			  IS SV_SKIN_EVENT_77
+SkinSpindleLow_M			  IS SV_SKIN_EVENT_78
+SkinSpindleBrake_M			  IS SV_SKIN_EVENT_79
+
+CncAndPlcActive_M             IS SV_SKIN_EVENT_80
+DryRun_M			          IS SV_SKIN_EVENT_81
+RapidOver_M					  IS SV_SKIN_EVENT_82
+SkinATCIndexPlus_M			  IS SV_SKIN_EVENT_83
+SkinATCIndexMinus_M			  IS SV_SKIN_EVENT_84
+SkinTurretIndex_M			  IS SV_Skin_EVENT_85
+
+EStopPressed_M                IS SV_SKIN_EVENT_93
+UsingKbOverride_M             IS SV_SKIN_EVENT_94
+;SetMem_M                      IS MEM795 ;Used for skinning
+;RstMem_M                      IS MEM796 ;Used for skinning
+;SetOut_M                      IS MEM797 ;Used for skinning
+;RstOut_M                      IS MEM798 ;Used for skinning
+SpinBrakeMode_M               IS SV_SKIN_EVENT_99
+
+SkinManualLube_M			  IS SV_SKIN_EVENT_200
+SkinClampOn_M				  IS SV_SKIN_EVENT_201
+SkinDustCollection_M		  IS SV_SKIN_EVENT_202
+SkinCutoff_M				  IS SV_SKIN_EVENT_203
+SkinPartChute_M				  IS SV_SKIN_EVENT_204
+SkinToolUnclamp_M			  IS SV_SKIN_EVENT_205
+SkinDustFoot_M				  IS SV_SKIN_EVENT_206
+SkinLaserAlign_M			  IS SV_SKIN_EVENT_207
+SkinPopUpPins_M				  IS SV_SKIN_EVENT_208
+SkinSpindleCooling_M		  IS SV_SKIN_Event_209
+---------------------

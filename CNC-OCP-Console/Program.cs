@@ -22,6 +22,7 @@ public partial class Program
     private static CNCPipe? _cncPipe;
     private static CNCPipe.Job? _cncJob;
     private static CNCPipe.Parameter? _cncParameter;
+    private static CNCPipe.Plc? _cncPlc;
 
     static async Task Main(string[] args)
     {
@@ -57,6 +58,11 @@ public partial class Program
             Console.WriteLine("[INIT] Initializing CNCPipe.Parameter...");
             _cncParameter = new CNCPipe.Parameter(_cncPipe);
             Console.WriteLine("✓ CNCPipe.Parameter initialized");
+
+            // Initialize CNCPipe.Plc once for reuse throughout application
+            Console.WriteLine("[INIT] Initializing CNCPipe.Plc...");
+            _cncPlc = new CNCPipe.Plc(_cncPipe);
+            Console.WriteLine("✓ CNCPipe.Plc initialized");
 
             // Initialize Teensy device manager via Serial
             Console.WriteLine("[INIT] Creating TeensySerialManager...");
@@ -210,19 +216,75 @@ public partial class Program
         },
         ["switch_feedhold"] = (cnc, value) =>
         {
-            // TODO: if (value is bool b) cnc.plc.SetPlcBit(2, b);
+            // Set feedhold skin event state
+            if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
+            {
+                _cncPlc.SetSkinEventState(SkinEvents.SkinFeedHold, (bool)value ? 1 : 0);
+            }
+            else
+            {
+                throw new Exception("  ? CNC Pipe or PLC not initialized for feedhold switch");
+            }
         },
         ["switch_cycleStart"] = (cnc, value) =>
         {
-            // TODO: if (value is bool b) cnc.plc.SetPlcBit(3, b);
+            // Set cycle start skin event state
+            if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
+            {
+                _cncPlc.SetSkinEventState(SkinEvents.SkinCycleStart, (bool)value ? 1 : 0);
+            }
+            else
+            {
+                throw new Exception("  ? CNC Pipe or PLC not initialized for cycle start switch");
+            }
         },
         ["switch_cycleStop"] = (cnc, value) =>
         {
-            // TODO: if (value is bool b) cnc.plc.SetPlcBit(4, b);
+            // Set cycle stop skin event state
+            if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
+            {
+                _cncPlc.SetSkinEventState(SkinEvents.SkinCycleCancel, (bool)value ? 1 : 0);
+            }
+            else
+            {
+                throw new Exception("  ? CNC Pipe or PLC not initialized for cycle stop switch");
+            }
         },
         ["switch_toolCheck"] = (cnc, value) =>
         {
-            // TODO: if (value is bool b) cnc.plc.SetPlcBit(5, b);
+            // Set tool check skin event state
+            if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
+            {
+                _cncPlc.SetSkinEventState(SkinEvents.SkinToolCheck, (bool)value ? 1 : 0);
+            }
+            else
+            {
+                throw new Exception("  ? CNC Pipe or PLC not initialized for tool check switch");
+            }
+        },
+        ["switch_incContPressed"] = (cnc, value) =>
+        {
+            // Set Inc/Cont skin event state
+            if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
+            {
+                _cncPlc.SetSkinEventState(SkinEvents.SkinIncCont, (bool)value ? 1 : 0);
+            }
+            else
+            {
+                throw new Exception("  ? CNC Pipe or PLC not initialized for Inc/Cont switch");
+            }
+        },
+        ["switch_slowFastPressed"] = (cnc, value) =>
+        {
+            // Set Slow/Fast Jog skin event state
+            if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
+            {
+                _cncPlc.SetSkinEventState(SkinEvents.SkinFastSlowJog, (bool)value ? 1 : 0);
+            }
+            else
+            {
+                throw new Exception("  ? CNC Pipe or PLC not initialized for Slow/Fast Jog switch");
+            }
         },
 
         // Jog step size control
@@ -256,11 +318,17 @@ public partial class Program
         {
             try
             {
-                var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
-                CNCPipe.ReturnCode returnCode = _cncJob?.RunCommand(gcode, false);
-                if (returnCode != CNCPipe.ReturnCode.SUCCESS)
+                if ((double)deltaX != 0.0 || (double)deltaY != 0.0 || (double)deltaZ != 0.0)
                 {
-                    throw new Exception($"CNC command failed with code: {returnCode}");
+                    Console.WriteLine($"  > Applying encoder deltas: ΔX={deltaX}, ΔY={deltaY}, ΔZ={deltaZ}, Step Size={stepSize}");
+
+                    var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
+
+                    CNCPipe.ReturnCode? returnCode = _cncJob?.RunCommand(gcode, false);
+                    if (returnCode != CNCPipe.ReturnCode.SUCCESS)
+                    {
+                        throw new Exception($"CNC command failed with code: {returnCode}");
+                    }
                 }
 
                 // Remove processed keys
