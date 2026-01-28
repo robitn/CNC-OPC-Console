@@ -1,8 +1,10 @@
 {
   "profiles": {
-    "CNC-OCP-Console": {
+    "CNC_OCP_Console": {
       "commandName": "Project",
-      "commandLineArgs": "-foo 2 -bar 4 snafoo"
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

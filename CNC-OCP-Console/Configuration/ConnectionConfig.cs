@@ -13,12 +13,14 @@ static class ConnectionConfig
 {
     // Serial port settings
     public const string TEENSY_HANDSHAKE_ID = "TEENSY_OCP_001";
+    public const string HANDSHAKE_REQUEST = "HANDSHAKE";
     public const int BAUD_RATE = 115200;
     public const int READ_TIMEOUT_MS = 100;
 
     // Connection retry settings
-    public const int MAX_CONSECUTIVE_FAILURES = 50;  // ~5 seconds at 100ms timeout
-    public const int RECONNECT_DELAY_MS = 2000;      // Wait before attempting reconnection
+    public const int HEARTBEAT_INTERVAL_MS = 10000;   // Teensy should send heartbeat every 10 seconds
+    public const int HEARTBEAT_TIMEOUT_MS = 15000;    // Reconnect if no message received in 15 seconds
+    public const int RECONNECT_DELAY_MS = 2000;       // Wait before attempting reconnection
     public const int RECONNECT_RETRY_DELAY_MS = 5000; // Wait between failed reconnection attempts
 
     // Handshake settings

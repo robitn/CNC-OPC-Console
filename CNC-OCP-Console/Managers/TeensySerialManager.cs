@@ -74,8 +74,12 @@ class TeensySerialManager
                     // Wait for device reset
                     Thread.Sleep(ConnectionConfig.POST_OPEN_DELAY_MS);
 
-                    // Synchronize to message boundaries
-                    log($"    Looking for handshake...");
+                    // Send handshake request to Teensy
+                    log($"    Sending handshake request...");
+                    WriteLine(ConnectionConfig.HANDSHAKE_REQUEST);
+
+                    // Wait for Teensy to respond with device_id
+                    log($"    Waiting for device ID response...");
                     bool foundHandshake = false;
 
                     for (int attempt = 0; attempt < ConnectionConfig.MAX_HANDSHAKE_ATTEMPTS; attempt++)
@@ -83,7 +87,8 @@ class TeensySerialManager
                         var line = ReadLine(ConnectionConfig.HANDSHAKE_TIMEOUT_MS);
                         if (line != null && !string.IsNullOrWhiteSpace(line))
                         {
-                            if (line.StartsWith(ConnectionConfig.TEENSY_HANDSHAKE_ID))
+                            // Expect response containing device_id (could be JSON, CSV, or key=value)
+                            if (line.Contains("device_id") || line.StartsWith(ConnectionConfig.TEENSY_HANDSHAKE_ID))
                             {
                                 log($"    Received: {line}");
                                 foundHandshake = true;
@@ -135,6 +140,17 @@ class TeensySerialManager
             return null;
 
         return _serialPort.ReadLine(timeoutMs);
+    }
+
+    /// <summary>
+    /// Write a line to serial port
+    /// </summary>
+    private void WriteLine(string message)
+    {
+        if (_serialPort == null || !_serialPort.IsOpen)
+            return;
+
+        _serialPort.WriteLine(message);
     }
 
     /// <summary>

@@ -17,19 +17,22 @@ namespace CNC_OCP_Console.Configuration
     public static class ParserConfig
     {
         /// <summary>
-        /// Maps step index values to their human-readable size strings
+        /// Maps step index values to their actual step sizes
+        /// Matches the step sizes defined in Program.cs GenerateG1Move
         /// </summary>
         public static readonly Dictionary<int, double> StepSizeMap = new()
         {
-            { 0, 0.01 },
-            { 1, 0.1 },
-            { 2, 1.0 }
+            { 0, 0.001 },
+            { 1, 0.01 },
+            { 2, 0.1 },
+            { 3, 1.0 },
+            { 4, 10.0 }
         };
 
         /// <summary>
         /// Default step size for unknown indices
         /// </summary>
-        public const string DefaultStepSize = "unknown";
+        public const double DefaultStepSize = 0.01;
 
         /// <summary>
         /// Maximum feedrate value (8-bit)

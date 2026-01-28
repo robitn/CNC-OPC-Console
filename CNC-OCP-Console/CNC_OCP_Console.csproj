@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <RootNamespace>CNC_OCP_Console</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="HidSharp" Version="2.6.4" />
+        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    </ItemGroup>
+
+    <!-- Exclude CentroidAPI.cs stub only on Windows (use DLL instead) -->
+    <ItemGroup Condition="'$(OS)' != 'Unix'">
+        <Compile Remove="CentroidAPI.cs" />
+    </ItemGroup>
+
+    <!-- Reference CentroidAPI.dll only on Windows -->
+    <ItemGroup Condition="'$(OS)' != 'Unix'">
+        <Reference Include="CentroidAPI">
+            <HintPath>C:\cncm\CentroidAPI.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+</Project>

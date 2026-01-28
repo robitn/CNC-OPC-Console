@@ -148,14 +148,15 @@ namespace CentroidAPI
         public class Job
         {
             public Job(CNCPipe? parent = null) { }
-            public ReturnCode StartJob(string jobName)
+
+            public ReturnCode Load(string path, string cnc12_working_directory)
             {
-                System.Console.WriteLine($"[Mock] StartJob({jobName})");
+                System.Console.WriteLine($"[Mock] Load({path}, {cnc12_working_directory})");
                 return ReturnCode.SUCCESS;
             }
-            public ReturnCode StopJob()
+            public ReturnCode Load(string path)
             {
-                System.Console.WriteLine("[Mock] StopJob()");
+                System.Console.WriteLine($"[Mock] Load({path})");
                 return ReturnCode.SUCCESS;
             }
             public ReturnCode GetJobStatus(out string status)

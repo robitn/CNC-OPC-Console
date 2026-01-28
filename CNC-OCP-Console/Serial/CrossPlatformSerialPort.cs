@@ -97,6 +97,7 @@ class CrossPlatformSerialPort : IDisposable
     public void Close() => _serialPort?.Close();
     public char ReadChar() => _serialPort?.ReadChar() ?? throw new InvalidOperationException("Serial port not available");
     public string? ReadLine(int timeoutMs) => _serialPort?.ReadLine(timeoutMs);
+    public void WriteLine(string message) => _serialPort?.WriteLine(message);
     public void Dispose() => _serialPort?.Dispose();
 }
 
@@ -108,4 +109,5 @@ interface ISerialPort : IDisposable
     void Close();
     char ReadChar();
     string? ReadLine(int timeoutMs);
+    void WriteLine(string message);
 }

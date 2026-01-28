@@ -8,6 +8,7 @@
  * This file is part of the CNC-OCP-Console project.
  */
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -129,6 +130,20 @@ class MacOSSerialPort : ISerialPort
         }
 
         return null;
+    }
+
+    public void WriteLine(string message)
+    {
+        if (_fileDescriptor < 0)
+            throw new InvalidOperationException("Port not open");
+
+        // Add newline and convert to bytes
+        string messageWithNewline = message + "\n";
+        byte[] bytes = Encoding.UTF8.GetBytes(messageWithNewline);
+
+        int bytesWritten = write(_fileDescriptor, bytes, bytes.Length);
+        if (bytesWritten < 0)
+            throw new IOException("Failed to write to serial port");
     }
 
     public void Dispose()

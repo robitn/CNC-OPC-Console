@@ -133,18 +133,28 @@ public partial class Program
                     continue;
                 }
 
+                // Check for heartbeat timeout (no messages received for extended period)
+                if (connectionMonitor.IsHeartbeatTimeout())
+                {
+                    bool reconnected = await connectionMonitor.ForceReconnectAsync(
+                        cancellationToken,
+                        $"No messages (data or heartbeat) received in {ConnectionConfig.HEARTBEAT_TIMEOUT_MS / 1000} seconds"
+                    );
+                    if (!reconnected)
+                    {
+                        continue;
+                    }
+                    // Reset counters after successful reconnection
+                    nullCount = 0;
+                    startWarningTime = DateTime.Now;
+                }
+
                 // Read CSV message from serial port
                 var message = teensyManager.ReadMessage(cancellationToken);
 
                 if (message == null)
                 {
                     nullCount++;
-
-                    if (connectionMonitor.ShouldReconnect())
-                    {
-                        await connectionMonitor.ForceReconnectAsync(cancellationToken);
-                        continue;
-                    }
 
                     // Display waiting message if we haven't received any data yet
                     if (successCount == 0)
@@ -156,7 +166,8 @@ public partial class Program
                     continue;
                 }
 
-                connectionMonitor.RecordSuccess();
+                // Record message received (resets heartbeat timer)
+                connectionMonitor.RecordMessageReceived();
 
                 // Parse message
                 Dictionary<string, object>? settings = null;
@@ -194,27 +205,31 @@ public partial class Program
 
     private static readonly Dictionary<string, Action<CNCPipe, object>> SettingMappers = new()
     {
-        // Informational settings (no CNC action required)
-        ["device_id"] = (cnc, value) => { /* Informational only */ },
-        ["device_version"] = (cnc, value) => { /* Informational only */ },
-        ["switches_raw"] = (cnc, value) => { /* Raw value - individual switches handled below */ },
-        ["feedrate_percent"] = (cnc, value) => { /* Derived from feedrate_value */ },
+        // Heartbeat message (sent periodically by Teensy to maintain connection)
+        ["heartbeat"] = (cnc, value) => { /* Connection keepalive - no action needed */ },
 
-        ["step_size"] = (cnc, value) => { /* Informational - step_index is used */ },
-        ["Command"] = (cnc, value) => { /* Fallback parser - ignore */ },
-        ["Value"] = (cnc, value) => { /* Fallback parser - ignore */ },
+        // Encoder deltas - handled separately in ApplySettings for G-code generation
+        ["enc_x"] = (cnc, value) => { /* Handled in ApplySettings */ },
+        ["enc_y"] = (cnc, value) => { /* Handled in ApplySettings */ },
+        ["enc_z"] = (cnc, value) => { /* Handled in ApplySettings */ },
+
+        // Absolute encoder positions (informational)
+        ["abs_x"] = (cnc, value) => { /* Informational only */ },
+        ["abs_y"] = (cnc, value) => { /* Informational only */ },
+        ["abs_z"] = (cnc, value) => { /* Informational only */ },
 
         // Feedrate control
-        ["feedrate_value"] = (cnc, value) =>
+        ["feedrate"] = (cnc, value) =>
         {
             // TODO: if (value is double d) cnc.state.SetFeedRate(d);
         },
-        // Switch mappings (map to appropriate PLC bits)
-        ["switch_enabled"] = (cnc, value) =>
+
+        // Switch mappings (map to appropriate skin events)
+        ["enabled"] = (cnc, value) =>
         {
             // TODO: if (value is bool b) cnc.plc.SetPlcBit(1, b);
         },
-        ["switch_feedhold"] = (cnc, value) =>
+        ["feed_hold_pressed"] = (cnc, value) =>
         {
             // Set feedhold skin event state
             if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
@@ -226,7 +241,7 @@ public partial class Program
                 throw new Exception("  ? CNC Pipe or PLC not initialized for feedhold switch");
             }
         },
-        ["switch_cycleStart"] = (cnc, value) =>
+        ["cycle_start_pressed"] = (cnc, value) =>
         {
             // Set cycle start skin event state
             if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
@@ -238,7 +253,7 @@ public partial class Program
                 throw new Exception("  ? CNC Pipe or PLC not initialized for cycle start switch");
             }
         },
-        ["switch_cycleStop"] = (cnc, value) =>
+        ["cycle_stop_pressed"] = (cnc, value) =>
         {
             // Set cycle stop skin event state
             if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
@@ -250,7 +265,7 @@ public partial class Program
                 throw new Exception("  ? CNC Pipe or PLC not initialized for cycle stop switch");
             }
         },
-        ["switch_toolCheck"] = (cnc, value) =>
+        ["tool_check_pressed"] = (cnc, value) =>
         {
             // Set tool check skin event state
             if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
@@ -262,7 +277,7 @@ public partial class Program
                 throw new Exception("  ? CNC Pipe or PLC not initialized for tool check switch");
             }
         },
-        ["switch_incContPressed"] = (cnc, value) =>
+        ["inc_cont_pressed"] = (cnc, value) =>
         {
             // Set Inc/Cont skin event state
             if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
@@ -274,7 +289,7 @@ public partial class Program
                 throw new Exception("  ? CNC Pipe or PLC not initialized for Inc/Cont switch");
             }
         },
-        ["switch_slowFastPressed"] = (cnc, value) =>
+        ["slow_fast_pressed"] = (cnc, value) =>
         {
             // Set Slow/Fast Jog skin event state
             if (_cncPipe != null && _cncPipe.IsConstructed() && _cncPlc != null)
@@ -292,37 +307,28 @@ public partial class Program
         {
             // TODO: if (value is int i) cnc.parameter.SetMachineParameter(xxx, i);
         },
-
-        // Encoder positions (if used separately from deltas)
-        ["encoder_posX"] = (cnc, value) =>
-        {
-            // TODO: if (value is double d) cnc.dro.SetDroValue(1, d);
-        },
-        ["encoder_posY"] = (cnc, value) =>
-        {
-            // TODO: if (value is double d) cnc.dro.SetDroValue(2, d);
-        },
-        ["encoder_posZ"] = (cnc, value) =>
-        {
-            // TODO: if (value is double d) cnc.dro.SetDroValue(3, d);
-        },
     };
 
     static void ApplySettings(Dictionary<string, object> settings)
     {
-        // Handle combined encoder delta move (G-Code generation)
-        if (settings.TryGetValue("encoder_deltaX", out var deltaX) &&
-            settings.TryGetValue("encoder_deltaY", out var deltaY) &&
-            settings.TryGetValue("encoder_deltaZ", out var deltaZ) &&
-            settings.TryGetValue("step_size", out var stepSize))
+        // Handle encoder delta move (G-Code generation)
+        // Process any encoder changes that were sent (event-driven: only changed axes are sent)
+        if (settings.ContainsKey("enc_x") || settings.ContainsKey("enc_y") || settings.ContainsKey("enc_z"))
         {
             try
             {
-                if ((double)deltaX != 0.0 || (double)deltaY != 0.0 || (double)deltaZ != 0.0)
-                {
-                    Console.WriteLine($"  > Applying encoder deltas: ΔX={deltaX}, ΔY={deltaY}, ΔZ={deltaZ}, Step Size={stepSize}");
+                // Get delta values (default to 0.0 if axis not present in this update)
+                var deltaX = settings.TryGetValue("enc_x", out var dx) ? (double)dx : 0.0;
+                var deltaY = settings.TryGetValue("enc_y", out var dy) ? (double)dy : 0.0;
+                var deltaZ = settings.TryGetValue("enc_z", out var dz) ? (double)dz : 0.0;
 
-                    var gcode = GenerateG1Move((double)deltaX, (double)deltaY, (double)deltaZ, settings);
+                if (deltaX != 0.0 || deltaY != 0.0 || deltaZ != 0.0)
+                {
+                    // Get step index if present (for step size calculation)
+                    var stepIndex = settings.TryGetValue("step_index", out var si) ? (int)si : 0;
+                    Console.WriteLine($"  > Applying encoder deltas: ΔX={deltaX}, ΔY={deltaY}, ΔZ={deltaZ}, Step Index={stepIndex}");
+
+                    var gcode = GenerateG1Move(deltaX, deltaY, deltaZ, settings);
 
                     CNCPipe.ReturnCode? returnCode = _cncJob?.RunCommand(gcode, false);
                     if (returnCode != CNCPipe.ReturnCode.SUCCESS)
@@ -331,16 +337,15 @@ public partial class Program
                     }
                 }
 
-                // Remove processed keys
-                settings.Remove("encoder_deltaX");
-                settings.Remove("encoder_deltaY");
-                settings.Remove("encoder_deltaZ");
-                // Also remove feedrate if used
-                settings.Remove("feedrate_value");
-                // Optionally remove individual encoder positions if present
-                settings.Remove("encoder_posX");
-                settings.Remove("encoder_posY");
-                settings.Remove("encoder_posZ");
+                // Remove processed encoder keys
+                settings.Remove("enc_x");
+                settings.Remove("enc_y");
+                settings.Remove("enc_z");
+                // Also remove related keys if present
+                settings.Remove("abs_x");
+                settings.Remove("abs_y");
+                settings.Remove("abs_z");
+                settings.Remove("feedrate");
             }
             catch (Exception ex)
             {
@@ -371,12 +376,16 @@ public partial class Program
 
     private static string GenerateG1Move(double dx, double dy, double dz, Dictionary<string, object> settings)
     {
-        var stepSize = settings.ContainsKey("step_size") ? (double)settings["step_size"] : 0.01;
+        // Map step_index to actual step sizes (adjust these values based on your requirements)
+        var stepSizes = new[] { 0.001, 0.01, 0.1, 1.0, 10.0 };
+        var stepIndex = settings.TryGetValue("step_index", out var si) ? (int)si : 1;
+        var stepSize = (stepIndex >= 0 && stepIndex < stepSizes.Length) ? stepSizes[stepIndex] : 0.01;
+
         dx *= stepSize;
         dy *= stepSize;
         dz *= stepSize;
         var gcode = $"G1 X{dx:#0.0####} Y{dy:#0.0####} Z{dz:#0.0####}";
-        if (settings.TryGetValue("feedrate_value", out var feedrate))
+        if (settings.TryGetValue("feedrate", out var feedrate))
         {
             gcode += $" F{feedrate}";
         }

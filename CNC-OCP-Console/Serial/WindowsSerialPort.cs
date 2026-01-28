@@ -8,6 +8,7 @@
  * This file is part of the CNC-OCP-Console project.
  */
 using System;
+using System.IO;
 using System.IO.Ports;
 
 /// <summary>
@@ -49,6 +50,14 @@ class WindowsSerialPort : ISerialPort
         {
             return null;
         }
+    }
+
+    public void WriteLine(string message)
+    {
+        if (_serialPort == null || !_serialPort.IsOpen)
+            throw new InvalidOperationException("Port not open");
+
+        _serialPort.WriteLine(message);
     }
 
     public void Dispose() => _serialPort?.Dispose();

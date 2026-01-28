@@ -143,26 +143,28 @@ class SerialToSettingsConverter
         if (ocpElement.TryGetProperty("switches", out var switches))
         {
             if (switches.TryGetProperty("enabled", out var enabled))
-                settings["switch_enabled"] = enabled.GetBoolean();
+                settings["enabled"] = enabled.GetBoolean();
             if (switches.TryGetProperty("feedhold", out var feedhold))
-                settings["switch_feedhold"] = feedhold.GetBoolean();
+                settings["feed_hold_pressed"] = feedhold.GetBoolean();
             if (switches.TryGetProperty("cycleStart", out var cycleStart))
-                settings["switch_cycleStart"] = cycleStart.GetBoolean();
+                settings["cycle_start_pressed"] = cycleStart.GetBoolean();
             if (switches.TryGetProperty("cycleStop", out var cycleStop))
-                settings["switch_cycleStop"] = cycleStop.GetBoolean();
+                settings["cycle_stop_pressed"] = cycleStop.GetBoolean();
             if (switches.TryGetProperty("toolCheck", out var toolCheck))
-                settings["switch_toolCheck"] = toolCheck.GetBoolean();
+                settings["tool_check_pressed"] = toolCheck.GetBoolean();
+            if (switches.TryGetProperty("incCont", out var incCont))
+                settings["inc_cont_pressed"] = incCont.GetBoolean();
+            if (switches.TryGetProperty("slowFast", out var slowFast))
+                settings["slow_fast_pressed"] = slowFast.GetBoolean();
             if (switches.TryGetProperty("stepIndex", out var stepIndex))
-                settings["switch_stepIndex"] = stepIndex.GetInt32();
-            if (switches.TryGetProperty("stepSize", out var stepSize))
-                settings["switch_stepSize"] = stepSize.GetInt32();
+                settings["step_index"] = stepIndex.GetInt32();
         }
 
         // Parse feedrate
         if (ocpElement.TryGetProperty("feedrate", out var feedrate))
         {
             if (feedrate.TryGetProperty("value", out var value))
-                settings["feedrate_value"] = value.GetDouble();
+                settings["feedrate"] = value.GetDouble();
             if (feedrate.TryGetProperty("minValue", out var minValue))
                 settings["feedrate_min"] = minValue.GetDouble();
             if (feedrate.TryGetProperty("maxValue", out var maxValue))
@@ -173,17 +175,17 @@ class SerialToSettingsConverter
         if (ocpElement.TryGetProperty("encoders", out var encoders))
         {
             if (encoders.TryGetProperty("deltaX", out var deltaX))
-                settings["encoder_deltaX"] = deltaX.GetDouble();
+                settings["enc_x"] = deltaX.GetDouble();
             if (encoders.TryGetProperty("deltaY", out var deltaY))
-                settings["encoder_deltaY"] = deltaY.GetDouble();
+                settings["enc_y"] = deltaY.GetDouble();
             if (encoders.TryGetProperty("deltaZ", out var deltaZ))
-                settings["encoder_deltaZ"] = deltaZ.GetDouble();
+                settings["enc_z"] = deltaZ.GetDouble();
             if (encoders.TryGetProperty("posX", out var posX))
-                settings["encoder_posX"] = posX.GetDouble();
+                settings["abs_x"] = posX.GetDouble();
             if (encoders.TryGetProperty("posY", out var posY))
-                settings["encoder_posY"] = posY.GetDouble();
+                settings["abs_y"] = posY.GetDouble();
             if (encoders.TryGetProperty("posZ", out var posZ))
-                settings["encoder_posZ"] = posZ.GetDouble();
+                settings["abs_z"] = posZ.GetDouble();
         }
 
         return settings.Count > 0 ? settings : null;
@@ -199,35 +201,35 @@ class SerialToSettingsConverter
 
         // Parse encoder deltas
         if (parts.Length > 2 && double.TryParse(parts[2].Trim(), out var encX))
-            settings["encoder_deltaX"] = encX;
+            settings["enc_x"] = encX;
 
         if (parts.Length > 3 && double.TryParse(parts[3].Trim(), out var encY))
-            settings["encoder_deltaY"] = encY;
+            settings["enc_y"] = encY;
 
         if (parts.Length > 4 && double.TryParse(parts[4].Trim(), out var encZ))
-            settings["encoder_deltaZ"] = encZ;
+            settings["enc_z"] = encZ;
 
         // Parse absolute encoder positions (new firmware)
         if (parts.Length > 5 && double.TryParse(parts[5].Trim(), out var absX))
-            settings["encoder_posX"] = absX;
+            settings["abs_x"] = absX;
 
         if (parts.Length > 6 && double.TryParse(parts[6].Trim(), out var absY))
-            settings["encoder_posY"] = absY;
+            settings["abs_y"] = absY;
 
         if (parts.Length > 7 && double.TryParse(parts[7].Trim(), out var absZ))
-            settings["encoder_posZ"] = absZ;
+            settings["abs_z"] = absZ;
 
         // Parse switches (now at index 8)
         if (parts.Length > 8 && int.TryParse(parts[8].Trim(), out var switches))
         {
             settings["switches_raw"] = switches;
-            settings["switch_enabled"] = (switches & 0x01) != 0;
-            settings["switch_feedhold"] = (switches & 0x02) != 0;
-            settings["switch_cycleStart"] = (switches & 0x04) != 0;
-            settings["switch_cycleStop"] = (switches & 0x08) != 0;
-            settings["switch_toolCheck"] = (switches & 0x10) != 0;
-            settings["switch_incContPressed"] = (switches & 0x20) != 0;
-            settings["switch_slowFastPressed"] = (switches & 0x40) != 0;
+            settings["enabled"] = (switches & 0x01) != 0;
+            settings["feed_hold_pressed"] = (switches & 0x02) != 0;
+            settings["cycle_start_pressed"] = (switches & 0x04) != 0;
+            settings["cycle_stop_pressed"] = (switches & 0x08) != 0;
+            settings["tool_check_pressed"] = (switches & 0x10) != 0;
+            settings["inc_cont_pressed"] = (switches & 0x20) != 0;
+            settings["slow_fast_pressed"] = (switches & 0x40) != 0;
         }
 
         // Parse step index and size (now at index 9)
@@ -242,7 +244,7 @@ class SerialToSettingsConverter
         // Parse feedrate (now at index 10)
         if (parts.Length > 10 && int.TryParse(parts[10].Trim(), out var feedrate))
         {
-            settings["feedrate_value"] = feedrate;
+            settings["feedrate"] = feedrate;
             settings["feedrate_percent"] = (feedrate / ParserConfig.MaxFeedrateValue) * 100.0;
         }
     }

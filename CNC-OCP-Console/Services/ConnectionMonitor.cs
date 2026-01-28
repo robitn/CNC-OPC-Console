@@ -18,28 +18,29 @@ using System.Threading.Tasks;
 class ConnectionMonitor
 {
     private readonly TeensySerialManager _manager;
-    private int _consecutiveFailures;
+    private DateTime _lastMessageReceived;
 
     public ConnectionMonitor(TeensySerialManager manager)
     {
         _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        _lastMessageReceived = DateTime.Now;
     }
 
     /// <summary>
-    /// Reset failure counter (call on successful read)
+    /// Record successful message receipt (data or heartbeat)
     /// </summary>
-    public void RecordSuccess()
+    public void RecordMessageReceived()
     {
-        _consecutiveFailures = 0;
+        _lastMessageReceived = DateTime.Now;
     }
 
     /// <summary>
-    /// Record a read failure and check if reconnection is needed
+    /// Check if heartbeat timeout has been exceeded
     /// </summary>
-    public bool ShouldReconnect()
+    public bool IsHeartbeatTimeout()
     {
-        _consecutiveFailures++;
-        return _consecutiveFailures >= ConnectionConfig.MAX_CONSECUTIVE_FAILURES;
+        var timeSinceLastMessage = (DateTime.Now - _lastMessageReceived).TotalMilliseconds;
+        return timeSinceLastMessage > ConnectionConfig.HEARTBEAT_TIMEOUT_MS;
     }
 
     /// <summary>
@@ -57,7 +58,7 @@ class ConnectionMonitor
             if (_manager.DiscoverAndConnect())
             {
                 Console.WriteLine("✓ Reconnected to Teensy device\n");
-                _consecutiveFailures = 0;
+                _lastMessageReceived = DateTime.Now;
                 return true;
             }
             else
@@ -72,13 +73,27 @@ class ConnectionMonitor
     }
 
     /// <summary>
-    /// Force reconnection due to excessive failures
+    /// Force reconnection due to heartbeat timeout or connection loss
     /// </summary>
-    public async Task ForceReconnectAsync(CancellationToken cancellationToken)
+    public async Task<bool> ForceReconnectAsync(CancellationToken cancellationToken, string reason = "No heartbeat received")
     {
-        Console.WriteLine($"\n⚠ No data received for {_consecutiveFailures} attempts. Triggering reconnection...");
+        Console.WriteLine($"\n⚠ {reason}. Triggering reconnection...");
         _manager.Disconnect();
-        _consecutiveFailures = 0;
-        await Task.Delay(1000, cancellationToken);
+        _lastMessageReceived = DateTime.Now;
+
+        await Task.Delay(ConnectionConfig.RECONNECT_DELAY_MS, cancellationToken);
+
+        if (_manager.DiscoverAndConnect())
+        {
+            Console.WriteLine("✓ Reconnected to Teensy device\n");
+            _lastMessageReceived = DateTime.Now;
+            return true;
+        }
+        else
+        {
+            Console.WriteLine($"✗ Reconnection failed. Retrying in {ConnectionConfig.RECONNECT_RETRY_DELAY_MS / 1000} seconds...");
+            await Task.Delay(ConnectionConfig.RECONNECT_RETRY_DELAY_MS, cancellationToken);
+            return false;
+        }
     }
 }
